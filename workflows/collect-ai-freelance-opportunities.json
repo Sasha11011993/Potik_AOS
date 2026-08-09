@@ -1,0 +1,1361 @@
+{
+  "name": "Збирати AI-проєкти з фриланс-платформ",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "45cb9a02-b45e-4d56-add5-f7e623e756b3",
+      "name": "Запустити вручну",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        288
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://community.n8n.io/c/jobs/13.rss",
+        "options": {}
+      },
+      "id": "2112c153-d926-4b55-b2c6-21cb5f796112",
+      "name": "Отримати Jobs з n8n Community",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        896,
+        0
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "notes": "RSS-джерело категорії Jobs з n8n Community. Без авторизації; перший пріоритет MVP.",
+      "disabled": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "source-id",
+              "name": "source_id",
+              "value": "n8n-community-jobs",
+              "type": "string"
+            },
+            {
+              "id": "source-name",
+              "name": "source_name",
+              "value": "n8n Community — Jobs",
+              "type": "string"
+            },
+            {
+              "id": "source-type",
+              "name": "source_type",
+              "value": "freelance_contract",
+              "type": "string"
+            },
+            {
+              "id": "source-url",
+              "name": "source_url",
+              "value": "https://community.n8n.io/c/jobs/13",
+              "type": "string"
+            },
+            {
+              "id": "external-id",
+              "name": "external_id",
+              "value": "={{ $('Отримати Jobs з n8n Community').item.json.guid ?? $('Отримати Jobs з n8n Community').item.json.link ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "title",
+              "name": "title",
+              "value": "={{ String($('Отримати Jobs з n8n Community').item.json.title ?? '').replace(/\\s+/g, ' ').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "url",
+              "name": "url",
+              "value": "={{ $('Отримати Jobs з n8n Community').item.json.link ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "author",
+              "name": "author",
+              "value": "={{ String($('Отримати Jobs з n8n Community').item.json.creator ?? $('Отримати Jobs з n8n Community').item.json['dc:creator'] ?? '').replace(/\\s+/g, ' ').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "published-at",
+              "name": "published_at",
+              "value": "={{ $('Отримати Jobs з n8n Community').item.json.isoDate ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "content-text",
+              "name": "content_text",
+              "value": "={{ String($('Отримати Jobs з n8n Community').item.json.contentSnippet ?? '').replace(/\\s+/g, ' ').replace(/\\s*Read full topic\\s*$/i, '').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "category",
+              "name": "category",
+              "value": "={{ $('Отримати Jobs з n8n Community').item.json.categories?.[0] ?? 'Jobs' }}",
+              "type": "string"
+            },
+            {
+              "id": "search-text",
+              "name": "search_text",
+              "value": "={{ [ $('Отримати Jobs з n8n Community').item.json.title ?? '', $('Отримати Jobs з n8n Community').item.json.contentSnippet ?? '' ].join(' ').replace(/\\s+/g, ' ').replace(/\\s*Read full topic\\s*$/i, '').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "fetched-at",
+              "name": "fetched_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "d6a88e9c-7c41-45fa-bc15-5ed94bd19d83",
+      "name": "Нормалізувати пости Jobs",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        0
+      ],
+      "notes": "Створює стабільний контракт даних для подальшої фільтрації та запису в Google Sheets."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "relevant-keywords",
+              "leftValue": "={{ (() => { const text = String($('Нормалізувати пости Jobs').item.json.search_text ?? '').toLowerCase(); const keywords = ['n8n', 'n8n developer', 'n8n expert', 'n8n specialist', 'n8n automation', 'n8n workflow', 'n8n ai agent', 'ai automation', 'ai agent', 'hiring n8n', 'workflow automation', 'automation engineer', 'automation developer', 'api integration', 'llm integration', 'openai', 'claude', 'agentic ai', 'rag', 'low-code', 'freelance', 'contract', 'lead automation', 'crm automation', 'customer support', 'sales automation', 'chatbot automation', 'data pipeline', 'reporting automation', 'content automation', 'saas integration', 'internal tools']; const exclusions = ['for hire', 'available for work', 'looking for work']; return keywords.some(keyword => text.includes(keyword)) && !exclusions.some(phrase => text.includes(phrase)); })() }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "id": "3ac2dbfa-b91b-455c-a70f-061407d345b8",
+      "name": "Залишити релевантні вакансії",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        1344,
+        0
+      ],
+      "notes": "Пропускає вакансії з ключовими словами про n8n, автоматизацію та AI. Відсікає пости виконавців на кшталт «for hire»."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "search-queries",
+              "name": "search_queries",
+              "value": "={{ ['n8n','n8n developer','n8n expert','n8n automation','n8n workflow','n8n integration','ai automation','ai agent','ai chatbot','workflow automation','automation developer','automation engineer','api integration','llm integration','openai integration','crm automation','webhook integration','make.com','zapier','no-code automation','low-code automation','lead generation automation','sales automation','crm workflow','customer support automation','telegram bot','whatsapp automation','email automation','data extraction','reporting automation','ecommerce automation'] }}",
+              "type": "array"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "5be88739-79ae-4ef9-918b-5750bccdda27",
+      "name": "Підготувати запити Freelancer",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        192
+      ],
+      "notes": "Повний набір ключових фраз для Freelancer.com із рядка джерела в таблиці Platforms.",
+      "disabled": false
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "search_queries",
+        "options": {
+          "destinationFieldName": "search_query"
+        }
+      },
+      "id": "af33d0fc-e16e-4950-a61e-154941dcae94",
+      "name": "Розгорнути запити Freelancer",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        448,
+        192
+      ],
+      "notes": "Перетворює список ключових фраз на окремі запити до API. HTTP-вузол виконається один раз для кожної фрази."
+    },
+    {
+      "parameters": {
+        "url": "https://www.freelancer.com/api/projects/0.1/projects/active/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "query",
+              "value": "={{ $('Розгорнути запити Freelancer').item.json.search_query }}"
+            },
+            {
+              "name": "limit",
+              "value": "50"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          }
+        }
+      },
+      "id": "8ba7ae72-ad06-4ee2-b24f-a9f02c7a57d2",
+      "name": "Отримати проєкти Freelancer",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        672,
+        192
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "notes": "Шукає активні проєкти через офіційний Freelancer API. Авторизація зберігається лише в credential."
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "result.projects",
+        "options": {
+          "destinationFieldName": "project"
+        }
+      },
+      "id": "778fee9e-0aaa-4786-8bc7-8f58292f3d14",
+      "name": "Розгорнути проєкти Freelancer",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        896,
+        192
+      ],
+      "notes": "Перетворює масив result.projects із відповіді API на окремі елементи для нормалізації."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "source-id",
+              "name": "source_id",
+              "value": "freelancer-projects",
+              "type": "string"
+            },
+            {
+              "id": "source-name",
+              "name": "source_name",
+              "value": "Freelancer.com",
+              "type": "string"
+            },
+            {
+              "id": "source-type",
+              "name": "source_type",
+              "value": "freelance_project",
+              "type": "string"
+            },
+            {
+              "id": "source-url",
+              "name": "source_url",
+              "value": "https://www.freelancer.com/jobs/n8n/",
+              "type": "string"
+            },
+            {
+              "id": "external-id",
+              "name": "external_id",
+              "value": "={{ String($('Розгорнути проєкти Freelancer').item.json.project?.id ?? '') }}",
+              "type": "string"
+            },
+            {
+              "id": "title",
+              "name": "title",
+              "value": "={{ String($('Розгорнути проєкти Freelancer').item.json.project?.title ?? '').replace(/\\s+/g, ' ').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "url",
+              "name": "url",
+              "value": "={{ $('Розгорнути проєкти Freelancer').item.json.project?.seo_url ? `https://www.freelancer.com/projects/${$('Розгорнути проєкти Freelancer').item.json.project.seo_url}` : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "author",
+              "name": "author",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "published-at",
+              "name": "published_at",
+              "value": "={{ $('Розгорнути проєкти Freelancer').item.json.project?.time_submitted ? DateTime.fromSeconds($('Розгорнути проєкти Freelancer').item.json.project.time_submitted).toISO() : '' }}",
+              "type": "string"
+            },
+            {
+              "id": "content-text",
+              "name": "content_text",
+              "value": "={{ String($('Розгорнути проєкти Freelancer').item.json.project?.description ?? $('Розгорнути проєкти Freelancer').item.json.project?.preview_description ?? '').replace(/\\s+/g, ' ').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "category",
+              "name": "category",
+              "value": "={{ String($('Розгорнути проєкти Freelancer').item.json.project?.seo_url ?? '').split('/')[0] || 'Freelancer project' }}",
+              "type": "string"
+            },
+            {
+              "id": "search-text",
+              "name": "search_text",
+              "value": "={{ [ $('Розгорнути проєкти Freelancer').item.json.project?.title ?? '', $('Розгорнути проєкти Freelancer').item.json.project?.description ?? $('Розгорнути проєкти Freelancer').item.json.project?.preview_description ?? '' ].join(' ').replace(/\\s+/g, ' ').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "fetched-at",
+              "name": "fetched_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "budget-min",
+              "name": "budget_min",
+              "value": "={{ String($('Розгорнути проєкти Freelancer').item.json.project?.budget?.minimum ?? '') }}",
+              "type": "string"
+            },
+            {
+              "id": "budget-max",
+              "name": "budget_max",
+              "value": "={{ String($('Розгорнути проєкти Freelancer').item.json.project?.budget?.maximum ?? '') }}",
+              "type": "string"
+            },
+            {
+              "id": "currency",
+              "name": "currency",
+              "value": "={{ String($('Розгорнути проєкти Freelancer').item.json.project?.currency?.code ?? '') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "3a0b6893-4477-4c4c-98c6-7a6a37240caa",
+      "name": "Нормалізувати проєкти Freelancer",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        192
+      ],
+      "notes": "Приводить дані Freelancer.com до спільного контракту джерел: ідентифікатор, назва, URL, дата, текст і пошуковий текст."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "relevant-keywords-freelancer",
+              "leftValue": "={{ (() => { const text = String($('Нормалізувати проєкти Freelancer').item.json.search_text ?? '').toLowerCase(); const keywords = ['n8n','n8n developer','n8n expert','n8n automation','n8n workflow','n8n integration','ai automation','ai agent','ai chatbot','workflow automation','automation developer','automation engineer','api integration','llm integration','openai integration','crm automation','webhook integration','make.com','zapier','no-code automation','low-code automation','lead generation automation','sales automation','crm workflow','customer support automation','telegram bot','whatsapp automation','email automation','data extraction','reporting automation','ecommerce automation']; return keywords.some(keyword => text.includes(keyword)); })() }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "id": "56e65f24-dc13-4195-8818-381f7c3e57dc",
+      "name": "Залишити релевантні проєкти Freelancer",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        1344,
+        192
+      ],
+      "notes": "Контрольний фільтр за повним списком 31 ключової фрази з Platforms для Freelancer.com."
+    },
+    {
+      "parameters": {
+        "url": "https://api.freelancehunt.com/v2/projects",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept-Language",
+              "value": "uk"
+            }
+          ]
+        },
+        "options": {
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "pagination": {
+            "pagination": {
+              "paginationMode": "responseContainsNextURL",
+              "nextURL": "={{ $response.body.links.next }}",
+              "limitPagesFetched": true,
+              "maxRequests": 61,
+              "requestInterval": 500
+            }
+          }
+        }
+      },
+      "id": "f3de409f-8e44-4290-9141-c0226c86c818",
+      "name": "Отримати проєкти Freelancehunt",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        672,
+        384
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000,
+      "notes": "Отримує відкриті проєкти через офіційний Freelancehunt API 2.0. Мову відповіді встановлено українську.",
+      "disabled": false
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data",
+        "options": {
+          "destinationFieldName": "project"
+        }
+      },
+      "id": "4833fb33-3fe0-4468-9cdc-076403bcd921",
+      "name": "Розгорнути проєкти Freelancehunt",
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        896,
+        384
+      ],
+      "notes": "Перетворює масив data з кожної сторінки Freelancehunt API на окремі проєкти."
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "source-id",
+              "name": "source_id",
+              "value": "freelancehunt-projects",
+              "type": "string"
+            },
+            {
+              "id": "source-name",
+              "name": "source_name",
+              "value": "Freelancehunt",
+              "type": "string"
+            },
+            {
+              "id": "source-type",
+              "name": "source_type",
+              "value": "freelance_project",
+              "type": "string"
+            },
+            {
+              "id": "source-url",
+              "name": "source_url",
+              "value": "https://freelancehunt.com/ua/projects",
+              "type": "string"
+            },
+            {
+              "id": "external-id",
+              "name": "external_id",
+              "value": "={{ String($('Розгорнути проєкти Freelancehunt').item.json.project?.id ?? '') }}",
+              "type": "string"
+            },
+            {
+              "id": "title",
+              "name": "title",
+              "value": "={{ String($('Розгорнути проєкти Freelancehunt').item.json.project?.attributes?.name ?? '').replace(/\\s+/g, ' ').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "url",
+              "name": "url",
+              "value": "={{ $('Розгорнути проєкти Freelancehunt').item.json.project?.links?.self?.web ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "author",
+              "name": "author",
+              "value": "={{ String($('Розгорнути проєкти Freelancehunt').item.json.project?.attributes?.employer?.login ?? '').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "published-at",
+              "name": "published_at",
+              "value": "={{ $('Розгорнути проєкти Freelancehunt').item.json.project?.attributes?.published_at ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "content-text",
+              "name": "content_text",
+              "value": "={{ String($('Розгорнути проєкти Freelancehunt').item.json.project?.attributes?.description ?? '').replace(/\\s+/g, ' ').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "category",
+              "name": "category",
+              "value": "={{ ($('Розгорнути проєкти Freelancehunt').item.json.project?.attributes?.skills ?? []).map(skill => skill.name).join(', ') || 'Freelancehunt project' }}",
+              "type": "string"
+            },
+            {
+              "id": "search-text",
+              "name": "search_text",
+              "value": "={{ [ $('Розгорнути проєкти Freelancehunt').item.json.project?.attributes?.name ?? '', $('Розгорнути проєкти Freelancehunt').item.json.project?.attributes?.description ?? '', ...($('Розгорнути проєкти Freelancehunt').item.json.project?.attributes?.skills ?? []).map(skill => skill.name ?? ''), ...($('Розгорнути проєкти Freelancehunt').item.json.project?.attributes?.tags ?? []).map(tag => tag.name ?? '') ].join(' ').replace(/\\s+/g, ' ').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "fetched-at",
+              "name": "fetched_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "budget-min",
+              "name": "budget_min",
+              "value": "={{ String($('Розгорнути проєкти Freelancehunt').item.json.project?.attributes?.budget?.amount ?? '') }}",
+              "type": "string"
+            },
+            {
+              "id": "budget-max",
+              "name": "budget_max",
+              "value": "={{ String($('Розгорнути проєкти Freelancehunt').item.json.project?.attributes?.budget?.amount ?? '') }}",
+              "type": "string"
+            },
+            {
+              "id": "currency",
+              "name": "currency",
+              "value": "={{ String($('Розгорнути проєкти Freelancehunt').item.json.project?.attributes?.budget?.currency ?? '') }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "51df0142-6c71-4ef8-8e51-0f168fade115",
+      "name": "Нормалізувати проєкти Freelancehunt",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        384
+      ],
+      "notes": "Приводить проєкти Freelancehunt до спільного контракту даних для подальшого збереження."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "relevant-keywords-freelancehunt",
+              "leftValue": "={{ (() => { const text = String($('Нормалізувати проєкти Freelancehunt').item.json.search_text ?? '').toLowerCase(); const keywords = ['n8n','n8n розробник','n8n автоматизація','n8n інтеграція','ai автоматизація','ai агент','ші агент','автоматизація бізнесу','автоматизація процесів','чат-бот','інтеграція api','crm автоматизація','openai','gpt','llm','webhook','telegram bot','make.com','zapier','no-code','low-code','інтегратор','автоматизація продажів','генерація лідів','підтримка клієнтів','crm workflow','telegram автоматизація','email автоматизація','звітність','синхронізація даних','парсинг даних','автоматизація контенту']; return keywords.some(keyword => text.includes(keyword)); })() }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "id": "22deca52-fe5d-4826-948c-75f15bbe602d",
+      "name": "Залишити релевантні проєкти Freelancehunt",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        1344,
+        384
+      ],
+      "notes": "Відбирає релевантні проєкти за повним набором 32 ключових фраз Freelancehunt з таблиці Platforms."
+    },
+    {
+      "parameters": {
+        "url": "https://djinni.co/jobs/rss",
+        "options": {}
+      },
+      "id": "dji-rss-001",
+      "name": "Отримати вакансії Djinni",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "typeVersion": 1.2,
+      "position": [
+        896,
+        576
+      ],
+      "notes": "Публічний RSS Djinni. Використовується замість неофіційного API або web-скрапінгу; не потребує авторизації.",
+      "disabled": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "source-id",
+              "name": "source_id",
+              "value": "djinni-jobs",
+              "type": "string"
+            },
+            {
+              "id": "source-name",
+              "name": "source_name",
+              "value": "Djinni",
+              "type": "string"
+            },
+            {
+              "id": "source-type",
+              "name": "source_type",
+              "value": "job_vacancy",
+              "type": "string"
+            },
+            {
+              "id": "source-url",
+              "name": "source_url",
+              "value": "https://djinni.co/jobs/",
+              "type": "string"
+            },
+            {
+              "id": "external-id",
+              "name": "external_id",
+              "value": "={{ $('Отримати вакансії Djinni').item.json.guid ?? $('Отримати вакансії Djinni').item.json.link ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "title",
+              "name": "title",
+              "value": "={{ String($('Отримати вакансії Djinni').item.json.title ?? '').replace(/\\s+/g, ' ').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "url",
+              "name": "url",
+              "value": "={{ $('Отримати вакансії Djinni').item.json.link ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "author",
+              "name": "author",
+              "value": "",
+              "type": "string"
+            },
+            {
+              "id": "published-at",
+              "name": "published_at",
+              "value": "={{ $('Отримати вакансії Djinni').item.json.isoDate ?? $('Отримати вакансії Djinni').item.json.pubDate ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "content-text",
+              "name": "content_text",
+              "value": "={{ String($('Отримати вакансії Djinni').item.json.contentSnippet ?? $('Отримати вакансії Djinni').item.json.content ?? '').replace(/<[^>]*>/g, ' ').replace(/\\s+/g, ' ').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "category",
+              "name": "category",
+              "value": "={{ Array.isArray($('Отримати вакансії Djinni').item.json.categories) ? $('Отримати вакансії Djinni').item.json.categories.join(', ') : ($('Отримати вакансії Djinni').item.json.category ?? 'Djinni job') }}",
+              "type": "string"
+            },
+            {
+              "id": "search-text",
+              "name": "search_text",
+              "value": "={{ [ $('Отримати вакансії Djinni').item.json.title ?? '', $('Отримати вакансії Djinni').item.json.contentSnippet ?? $('Отримати вакансії Djinni').item.json.content ?? '', Array.isArray($('Отримати вакансії Djinni').item.json.categories) ? $('Отримати вакансії Djinni').item.json.categories.join(' ') : ($('Отримати вакансії Djinni').item.json.category ?? '') ].join(' ').replace(/<[^>]*>/g, ' ').replace(/\\s+/g, ' ').trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "fetched-at",
+              "name": "fetched_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "dji-normalize-001",
+      "name": "Нормалізувати вакансії Djinni",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1120,
+        576
+      ],
+      "notes": "Приводить RSS-записи Djinni до спільного контракту даних усіх джерел."
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "relevant-keywords-djinni",
+              "leftValue": "={{ (() => { const text = String($('Нормалізувати вакансії Djinni').item.json.search_text ?? '').toLowerCase(); const keywords = ['n8n','n8n developer','n8n automation engineer','ai automation engineer','ai automation specialist','ai agent developer','ai integration engineer','automation engineer','low-code developer','workflow automation','llm integration','openai','claude','gemini','rag','api integration','crm automation','python automation','make.com','zapier','no-code','agentic ai','lead automation','sales automation','customer support','crm workflows','data pipelines','reporting automation','internal tools','chatbot automation','content automation','operations automation']; return keywords.some(keyword => text.includes(keyword)); })() }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "id": "dji-filter-001",
+      "name": "Залишити релевантні вакансії Djinni",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        1344,
+        576
+      ],
+      "notes": "Відбирає вакансії за повним набором 32 ключових фраз Djinni з таблиці Platforms."
+    },
+    {
+      "parameters": {
+        "numberInputs": 4
+      },
+      "id": "merge-all-sources-001",
+      "name": "Об’єднати релевантні результати",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1568,
+        256
+      ],
+      "notes": "Збирає результати всіх чотирьох релевантних гілок в єдиний потік. Порядок входів: n8n Community, Freelancer.com, Freelancehunt, Djinni."
+    },
+    {
+      "parameters": {
+        "compare": "selectedFields",
+        "fieldsToCompare": "dedupe_key",
+        "options": {
+          "removeOtherFields": false
+        }
+      },
+      "id": "dedup-external-id-001",
+      "name": "Прибрати дублікати за dedupe_key",
+      "type": "n8n-nodes-base.removeDuplicates",
+      "typeVersion": 1.1,
+      "position": [
+        2016,
+        288
+      ],
+      "notes": "Залишає першу появу кожного external_id та зберігає всі поля нормалізованого запису."
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0",
+          "cachedResultName": "n8n AI Opportunities Monitor (Моніторинг можливостей для n8n та AI)"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "id",
+          "value": "215613686",
+          "cachedResultName": "Opportunities (Можливості)"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "opportunity_id (ID можливості)": "={{ `${$json.source_id}:${$json.external_id}` }}",
+            "dedupe_key (Ключ дедуплікації)": "={{ `${$json.source_id}:${$json.external_id}` }}",
+            "source_id (ID джерела)": "={{ $json.source_id }}",
+            "external_id (ID на платформі)": "={{ $json.external_id }}",
+            "title (Назва проєкту або вакансії)": "={{ $json.title }}",
+            "description (Опис)": "={{ $json.content_text }}",
+            "url (Посилання)": "={{ $json.url }}",
+            "client_name (Ім’я клієнта або компанії)": "={{ $json.author }}",
+            "employment_type (Тип зайнятості)": "={{ $json.source_type }}",
+            "published_at (Дата публікації)": "={{ $json.published_at }}",
+            "collected_at (Дата збору)": "={{ $json.fetched_at }}",
+            "review_status (Статус перевірки)": "new",
+            "updated_at (Дата оновлення запису)": "={{ $now.toISO() }}",
+            "budget_min (Мінімальний бюджет)": "={{ $json.budget_min ?? '' }}",
+            "budget_max (Максимальний бюджет)": "={{ $json.budget_max ?? '' }}",
+            "currency (Валюта)": "={{ $json.currency ?? '' }}"
+          },
+          "matchingColumns": [
+            "dedupe_key (Ключ дедуплікації)"
+          ],
+          "schema": [
+            {
+              "id": "opportunity_id (ID можливості)",
+              "displayName": "opportunity_id (ID можливості)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "dedupe_key (Ключ дедуплікації)",
+              "displayName": "dedupe_key (Ключ дедуплікації)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "source_id (ID джерела)",
+              "displayName": "source_id (ID джерела)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "profile_id (ID профілю пошуку)",
+              "displayName": "profile_id (ID профілю пошуку)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "external_id (ID на платформі)",
+              "displayName": "external_id (ID на платформі)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "title (Назва проєкту або вакансії)",
+              "displayName": "title (Назва проєкту або вакансії)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "description (Опис)",
+              "displayName": "description (Опис)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "url (Посилання)",
+              "displayName": "url (Посилання)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "client_name (Ім’я клієнта або компанії)",
+              "displayName": "client_name (Ім’я клієнта або компанії)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "location (Локація)",
+              "displayName": "location (Локація)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "language (Мова)",
+              "displayName": "language (Мова)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "budget_min (Мінімальний бюджет)",
+              "displayName": "budget_min (Мінімальний бюджет)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "budget_max (Максимальний бюджет)",
+              "displayName": "budget_max (Максимальний бюджет)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "currency (Валюта)",
+              "displayName": "currency (Валюта)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "employment_type (Тип зайнятості)",
+              "displayName": "employment_type (Тип зайнятості)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "published_at (Дата публікації)",
+              "displayName": "published_at (Дата публікації)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "collected_at (Дата збору)",
+              "displayName": "collected_at (Дата збору)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "matched_keywords (Знайдені ключові слова)",
+              "displayName": "matched_keywords (Знайдені ключові слова)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "relevance_score (Оцінка релевантності)",
+              "displayName": "relevance_score (Оцінка релевантності)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "review_status (Статус перевірки)",
+              "displayName": "review_status (Статус перевірки)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "notes (Примітки)",
+              "displayName": "notes (Примітки)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at (Дата створення запису)",
+              "displayName": "created_at (Дата створення запису)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at (Дата оновлення запису)",
+              "displayName": "updated_at (Дата оновлення запису)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "useAppend": true
+        }
+      },
+      "id": "write-opportunities-001",
+      "name": "Зберегти можливості в Google Sheets",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2240,
+        288
+      ],
+      "notes": "Upsert у аркуш Opportunities (Можливості): external_id є ключем, тому нові записи додаються, а наявні оновлюються без повторних рядків.",
+      "disabled": false
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "dedupe-key",
+              "name": "dedupe_key",
+              "value": "={{ `${$json.source_id}:${$json.external_id}` }}",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "prepare-dedupe-key-001",
+      "name": "Підготувати dedupe_key",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1792,
+        288
+      ],
+      "notes": "Створює глобально унікальний ключ з ідентифікатора джерела та external_id до дедуплікації."
+    },
+    {
+      "id": "sticky-purpose-001",
+      "name": "Призначення автоматизації",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        0,
+        -40
+      ],
+      "parameters": {
+        "content": "### Призначення автоматизації\nЗбирає AI, n8n та automation-можливості з 4 платформ, нормалізує й відбирає релевантні записи. Прибирає дублікати та зберігає результати для ручної перевірки в Google Sheets.",
+        "width": 520,
+        "height": 180,
+        "color": 4
+      }
+    }
+  ],
+  "connections": {
+    "Запустити вручну": {
+      "main": [
+        [
+          {
+            "node": "Отримати Jobs з n8n Community",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Підготувати запити Freelancer",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Отримати проєкти Freelancehunt",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Отримати вакансії Djinni",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Отримати Jobs з n8n Community": {
+      "main": [
+        [
+          {
+            "node": "Нормалізувати пости Jobs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Нормалізувати пости Jobs": {
+      "main": [
+        [
+          {
+            "node": "Залишити релевантні вакансії",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Підготувати запити Freelancer": {
+      "main": [
+        [
+          {
+            "node": "Розгорнути запити Freelancer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Розгорнути запити Freelancer": {
+      "main": [
+        [
+          {
+            "node": "Отримати проєкти Freelancer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Отримати проєкти Freelancer": {
+      "main": [
+        [
+          {
+            "node": "Розгорнути проєкти Freelancer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Розгорнути проєкти Freelancer": {
+      "main": [
+        [
+          {
+            "node": "Нормалізувати проєкти Freelancer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Нормалізувати проєкти Freelancer": {
+      "main": [
+        [
+          {
+            "node": "Залишити релевантні проєкти Freelancer",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Отримати проєкти Freelancehunt": {
+      "main": [
+        [
+          {
+            "node": "Розгорнути проєкти Freelancehunt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Розгорнути проєкти Freelancehunt": {
+      "main": [
+        [
+          {
+            "node": "Нормалізувати проєкти Freelancehunt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Нормалізувати проєкти Freelancehunt": {
+      "main": [
+        [
+          {
+            "node": "Залишити релевантні проєкти Freelancehunt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Отримати вакансії Djinni": {
+      "main": [
+        [
+          {
+            "node": "Нормалізувати вакансії Djinni",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Нормалізувати вакансії Djinni": {
+      "main": [
+        [
+          {
+            "node": "Залишити релевантні вакансії Djinni",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Залишити релевантні вакансії": {
+      "main": [
+        [
+          {
+            "node": "Об’єднати релевантні результати",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Залишити релевантні проєкти Freelancer": {
+      "main": [
+        [
+          {
+            "node": "Об’єднати релевантні результати",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Залишити релевантні проєкти Freelancehunt": {
+      "main": [
+        [
+          {
+            "node": "Об’єднати релевантні результати",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Залишити релевантні вакансії Djinni": {
+      "main": [
+        [
+          {
+            "node": "Об’єднати релевантні результати",
+            "type": "main",
+            "index": 3
+          }
+        ]
+      ]
+    },
+    "Об’єднати релевантні результати": {
+      "main": [
+        [
+          {
+            "node": "Підготувати dedupe_key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Підготувати dedupe_key": {
+      "main": [
+        [
+          {
+            "node": "Прибрати дублікати за dedupe_key",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Прибрати дублікати за dedupe_key": {
+      "main": [
+        [
+          {
+            "node": "Зберегти можливості в Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate"
+  },
+  "active": false,
+  "meta": {
+    "templateCredsSetupCompleted": true
+  },
+  "tags": []
+}

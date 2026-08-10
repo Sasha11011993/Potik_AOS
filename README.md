@@ -8,6 +8,7 @@
 | --- | --- | --- |
 | Збирати AI-проєкти з фриланс-платформ | Збирає релевантні фриланс-проєкти й вакансії з кількох платформ у Google Sheets. | [README](workflows/collect-ai-freelance-opportunities/README.md) |
 | Збирати AI-новини з технологічних джерел | Збирає та відбирає AI / automation-новини з технологічних блогів у Google Sheets. | [README](workflows/collect-ai-technology-news/README.md) |
+| Analyze AI demand from opportunities | Аналізує клієнтські AI-проєкти, оцінює попит і формує індивідуальний та агрегований звіти в Google Sheets. | [README](workflows/analyze-ai-demand/README.md) |
 
 ## Експорти
 

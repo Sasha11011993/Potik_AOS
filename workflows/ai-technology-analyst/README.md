@@ -1,4 +1,4 @@
-# AI Technology Analyst
+�r�^�f��ئ{Oly�'vî���# AI Technology Analyst
 
 Workflow аналізує новини про AI, n8n, AI agents, MCP, інтеграції та vibe coding і формує практичні Tech Signals для бізнес-автоматизації.
 
@@ -42,6 +42,12 @@ News
 Workflow запускається вручну через **Execute Workflow**. Після запуску перевірте статус execution, нові рядки в `Tech_Signals` і підсумковий рядок в `Automation_Runs`.
 
 Credentials не містяться в export JSON; після імпорту в n8n потрібно прив’язати `Potik_AOS` для Google Sheets і `Potik_AOS-OpenAI-Bearer` для OpenAI API.
+
+## Переносима конфігурація після імпорту
+
+Виберіть свій документ замість `[REDACTED_GOOGLE_SHEET_ID]` у вузлах `Read News`, `Write Tech Signal`, `Mark News Irrelevant`, `Mark News Analyzed`, `Find Existing Tech Signal`, `Mark News Keyword Filtered` і `Write Automation Run Directly`. Підтвердьте аркуші `News`, `Tech_Signals` та `Automation_Runs`, після чого прив’яжіть Google Sheets OAuth2 і OpenAI Bearer/Auth credentials.
+
+Усі мережеві ноди мають три спроби з паузою 5 секунд. Підсумковий success-запис формується один раз після явного бар’єра outcome-гілок; остаточні помилки передаються до спільного `Handle Potik AOS workflow failure`, який потрібно опублікувати та призначити як Error Workflow у Settings.
 
 
 

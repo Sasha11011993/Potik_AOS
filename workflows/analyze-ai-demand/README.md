@@ -1,7 +1,4 @@
-Exit code: 0
-Wall time: 0.9 seconds
-Output:
-# AI Demand Analyst
+�r�^�f��ئ{Oly�'vî���# AI Demand Analyst
 
 ## Операційна інструкція
 
@@ -115,17 +112,23 @@ Google Sheets працює в режимі **Append or Update**, тому пов
 | --- | --- |
 | Немає рядків у Demand Analysis | `Read opportunities`, `Filter valid opportunities`, `Classify opportunity via HTTP`; можливо, жоден запис не потрапив у `client_project`. |
 | Неочікувані AI-дані | `Extract demand signals via HTTP` у execution data, текст оголошення та `confidence`. |
-| Не оновлюється Google Sheets | Credential `Potik_AOS`, доступ до таблиці, ID документа й точні заголовки колонок. Помилки Sheets після повторних спроб потрапляють у `Capture analysis error`. |
+| Не оновлюється Google Sheets | Credential `Potik_AOS`, доступ до таблиці, ID документа й точні заголовки колонок. Остаточні помилки передаються до спільного Error Workflow. |
 | Неочікуваний тренд | `recent_30_days_count` і `previous_30_days_count`. Тренд — порівняння двох вікон, а не прогноз. |
 | Помилка OpenAI | Credential, ліміти API й повідомлення у виконанні; HTTP-ноди OpenAI виконують повторні спроби перед зупинкою виконання. |
 
 ### 10. Надійність і безпека
 
-Ноди OpenAI та Google Sheets налаштовані на три спроби з паузою 5 секунд. `Read opportunities` і обидві ноди запису до Google Sheets мають окремий error output, що веде до `Capture analysis error`.
+Усі мережеві ноди — OpenAI, Google Sheets і зовнішні HTTP-запити — налаштовані на три спроби з паузою 5 секунд. Невідновлювана помилка не поглинається workflow: n8n передає її до спільного Error Workflow.
 
 Credentials зберігаються в n8n; робочі Google Sheets і OpenAI credentials мають назву `Potik_AOS`. Не додавайте токени, API-ключі чи паролі в Set-ноди, prompts або звичайні поля workflow.
 
 ### 11. Межі поточної версії
 
 Workflow запускається вручну, не надсилає автоматичних сповіщень і не має Schedule Trigger. Він аналізує доступні можливості та формує сигнали попиту, але не створює ставки, не пише клієнтам і не ухвалює бізнес-рішення замість оператора.
+
+## Переносима конфігурація після імпорту
+
+Виберіть свій документ замість `[REDACTED_GOOGLE_SHEET_ID]` у вузлах `Read opportunities`, `Upsert demand analysis rows`, `Upsert demand report rows` і `Write demand automation run`. Підтвердьте відповідні аркуші `Opportunities`, `Demand Analysis`, `Demand Report` та `Automation_Runs`, після чого прив’яжіть Google Sheets OAuth2 і OpenAI Bearer/Auth credentials через n8n Credentials.
+
+Для запису та Telegram-сповіщення про остаточні помилки імпортуйте й опублікуйте `Handle Potik AOS workflow failure`, а потім призначте його як Error Workflow у Settings цього workflow.
 

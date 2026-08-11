@@ -15,6 +15,7 @@
 
 - [Фриланс-можливості](workflows/collect-ai-freelance-opportunities.json)
 - [AI-новини](workflows/collect-ai-technology-news.json)
+- [AI Technology Analyst](workflows/ai-technology-analyst.json)
 
 Усі експорти не містять API-ключів, токенів або OAuth-секретів. Після імпорту в n8n перевірте й прив’яжіть потрібні credentials.
 

@@ -1,3 +1,6 @@
+Exit code: 0
+Wall time: 0.9 seconds
+Output:
 # AI Demand Analyst
 
 ## Операційна інструкція
@@ -9,23 +12,23 @@ AI Demand Analyst аналізує можливості у сфері AI-авт�
 - Workflow у n8n: [Analyze AI demand from opportunities](https://n8n.mykh-automation.com/workflow/AcXgjF2Y3WVhXQuu)
 - Таблиця даних і результатів: [n8n AI Opportunities Monitor](https://docs.google.com/spreadsheets/d/1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0/edit)
 - Поточний стан: ручний тригер, workflow не активований і не має Schedule Trigger.
-- Перевірений запуск: execution `2231` завершився `Success`; повна вибірка оброблена за 7 хвилин 42 секунди.
+- Перевірений запуск: `ADA-2332` завершився `Success` за 171 секунду; прочитано 154 можливості, 65 проаналізовано.
 
 ### 2. Схема обробки
 
-`Ручний запуск → Read opportunities → Filter valid opportunities → Classify opportunity intent → Extract demand signals → Combine source and AI signals → Calculate demand score → Group demand by automation type → Score demand strength and trend → Demand Analysis і Demand Report`
+`Ручний запуск → Read opportunities → Filter valid opportunities → Classify opportunity via HTTP → Normalize opportunity intent usage → Keep client projects → Extract demand signals via HTTP → Normalize demand signals usage → Calculate demand score → Group demand by automation type → Score demand strength and trend → Demand Analysis → Demand Report → Automation_Runs`
 
 Паралельно після розрахунку індивідуальні можливості записуються до `Demand Analysis`, а згрупований ринковий результат — до `Demand Report`.
 
 ### 3. Відсів шуму та правила класифікації
 
-Text Classifier визначає намір запису. Лише категорія `client_project` означає реальний запит клієнта і проходить до AI-аналізу.
+`Classify opportunity via HTTP` викликає OpenAI Responses API і визначає намір запису. Лише категорія `client_project` означає реальний запит клієнта і проходить до AI-аналізу.
 
 Категорії `client_hiring`, `provider_offer` та `irrelevant` не потрапляють до `Demand Analysis` або `Demand Report`. Це зменшує вплив вакансій, портфоліо й нерелевантних публікацій на оцінку попиту.
 
 ### 4. Які сигнали витягує AI
 
-Information Extractor формує:
+`Extract demand signals via HTTP` викликає OpenAI Responses API та формує:
 
 - проблему клієнта;
 - тип автоматизації;
@@ -79,31 +82,50 @@ Information Extractor формує:
 
 Google Sheets працює в режимі **Append or Update**, тому повторний запуск оновлює записи за ключами, а не створює дублікати.
 
-### 7. Інструкція оператора
+`Automation_Runs (Запуски автоматизацій)` містить один рядок на нормальний завершений запуск за ключем `run_id`. Тут перевіряйте статус, кількість записів, AI-виклики, токени та орієнтовну вартість.
+
+### 7. Облік токенів і вартості
+
+Обидва AI-кроки працюють через OpenAI Responses API. Ноди `Normalize opportunity intent usage` і `Normalize demand signals usage` зберігають фактичні `input_tokens`, `output_tokens`, `total_tokens` і cached input tokens із відповіді API.
+
+Наприкінці запуску `Prepare demand run summary` підсумовує usage, а `Write demand automation run` записує `ai_calls`, `model_name`, `input_tokens`, `output_tokens`, `total_tokens`, `estimated_cost_usd` і `run_metadata` до `Automation_Runs`.
+
+Для `gpt-5.4-mini` формула вартості використовує $0.75 / 1M input, $0.075 / 1M cached input і $4.50 / 1M output tokens:
+
+```text
+(input − cached_input) × 0.75 / 1M
++ cached_input × 0.075 / 1M
++ output × 4.50 / 1M
+```
+
+Приклад `ADA-2332`: 219 AI-викликів, 113335 input tokens, 11946 output tokens, 125281 токенів загалом, `estimated_cost_usd = 0.13582065`; статус `success`.
+
+### 8. Інструкція оператора
 
 1. Відкрийте workflow у n8n і натисніть **Execute Workflow**.
 2. Дочекайтеся статусу **Success** у вкладці **Executions**.
 3. Відкрийте `Demand Analysis` для перевірки окремих можливостей.
-4. Відкрийте `Demand Report` для перегляду кластерів попиту.
+4. Відкрийте `Demand Report` для перегляду кластерів попиту і `Automation_Runs` для токенів, вартості та статусу запуску.
 
 Для аналізу ринку спочатку сортуйте `Demand Report` за `rank` або `demand_score`, далі перевіряйте `key_client_problems`, `top_technologies`, `top_required_skills`, `client_types` і `potential_service`.
 
-### 8. Діагностика
+### 9. Діагностика
 
 | Симптом | Що перевірити |
 | --- | --- |
-| Немає рядків у Demand Analysis | `Read opportunities`, `Filter valid opportunities`, `Classify opportunity intent`; можливо, жоден запис не потрапив у `client_project`. |
-| Неочікувані AI-дані | `Extract demand signals` у execution data, текст оголошення та `confidence`. |
+| Немає рядків у Demand Analysis | `Read opportunities`, `Filter valid opportunities`, `Classify opportunity via HTTP`; можливо, жоден запис не потрапив у `client_project`. |
+| Неочікувані AI-дані | `Extract demand signals via HTTP` у execution data, текст оголошення та `confidence`. |
 | Не оновлюється Google Sheets | Credential `Potik_AOS`, доступ до таблиці, ID документа й точні заголовки колонок. Помилки Sheets після повторних спроб потрапляють у `Capture analysis error`. |
 | Неочікуваний тренд | `recent_30_days_count` і `previous_30_days_count`. Тренд — порівняння двох вікон, а не прогноз. |
-| Помилка OpenAI | Credential, ліміти API й повідомлення у виконанні; AI-ноди виконують повторні спроби перед зупинкою виконання. |
+| Помилка OpenAI | Credential, ліміти API й повідомлення у виконанні; HTTP-ноди OpenAI виконують повторні спроби перед зупинкою виконання. |
 
-### 9. Надійність і безпека
+### 10. Надійність і безпека
 
 Ноди OpenAI та Google Sheets налаштовані на три спроби з паузою 5 секунд. `Read opportunities` і обидві ноди запису до Google Sheets мають окремий error output, що веде до `Capture analysis error`.
 
 Credentials зберігаються в n8n; робочі Google Sheets і OpenAI credentials мають назву `Potik_AOS`. Не додавайте токени, API-ключі чи паролі в Set-ноди, prompts або звичайні поля workflow.
 
-### 10. Межі поточної версії
+### 11. Межі поточної версії
 
 Workflow запускається вручну, не надсилає автоматичних сповіщень і не має Schedule Trigger. Він аналізує доступні можливості та формує сигнали попиту, але не створює ставки, не пише клієнтам і не ухвалює бізнес-рішення замість оператора.
+

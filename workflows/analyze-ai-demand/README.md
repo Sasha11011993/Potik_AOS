@@ -1,4 +1,4 @@
-�r�^�f��ئ{Oly�'vî���# AI Demand Analyst
+# AI Demand Analyst
 
 ## Операційна інструкція
 

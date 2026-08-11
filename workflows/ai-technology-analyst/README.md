@@ -1,4 +1,4 @@
-�r�^�f��ئ{Oly�'vî���# AI Technology Analyst
+# AI Technology Analyst
 
 Workflow аналізує новини про AI, n8n, AI agents, MCP, інтеграції та vibe coding і формує практичні Tech Signals для бізнес-автоматизації.
 

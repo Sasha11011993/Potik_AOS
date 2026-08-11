@@ -1,4 +1,4 @@
-�r�^�f��ئ{Oly�'vî���# Handle Potik AOS workflow failure
+# Handle Potik AOS workflow failure
 
 Спільний Error Trigger workflow для всіх експортів Potik AOS. Після остаточного збою він формує `ERR-<workflowId>-<executionId>`, записує failed-run до `Automation_Runs` і надсилає Telegram-повідомлення з workflow, execution URL, вузлом і помилкою.
 

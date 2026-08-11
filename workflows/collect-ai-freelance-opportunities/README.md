@@ -1,4 +1,4 @@
-# Збирати AI-проєкти з фриланс-платформ
+�r�^�f��ئ{Oly�'vî���# Збирати AI-проєкти з фриланс-платформ
 
 Автоматизація n8n для пошуку AI, n8n та automation-можливостей на фриланс-платформах. Workflow отримує дані з джерел, нормалізує їх, фільтрує за ключовими словами, прибирає дублікати й зберігає результати для ручної перевірки в Google Sheets.
 
@@ -79,6 +79,12 @@ source_id:external_id
 4. Запустіть workflow вручну та перевірте Execution data і таблицю.
 
 Експорт навмисно не містить токенів, API-ключів або OAuth-даних.
+
+## Переносима конфігурація після імпорту
+
+У вузлі `Зберегти можливості в Google Sheets` виберіть свій документ замість `[REDACTED_GOOGLE_SHEET_ID]` і підтвердьте аркуш `Opportunities (Можливості)`. Для API-вузлів створіть або прив’яжіть `httpHeaderAuth` для Freelancer.com та `httpBearerAuth` для Freelancehunt; Google Sheets використовуйте лише через OAuth2 credential.
+
+Усі RSS, HTTP та Google Sheets-вузли мають три спроби з паузою 5 секунд. Після імпорту призначте спільний `Handle Potik AOS workflow failure` як Error Workflow у Settings.
 
 ## Credentials і безпека
 

@@ -1,4 +1,4 @@
-+# AI Technology Analyst
+# AI Technology Analyst
 
 Workflow аналізує новини про AI, n8n, AI agents, MCP, інтеграції та vibe coding і формує практичні Tech Signals для бізнес-автоматизації.
 
@@ -42,5 +42,7 @@ News
 Workflow запускається вручну через **Execute Workflow**. Після запуску перевірте статус execution, нові рядки в `Tech_Signals` і підсумковий рядок в `Automation_Runs`.
 
 Credentials не містяться в export JSON; після імпорту в n8n потрібно прив’язати `Potik_AOS` для Google Sheets і `Potik_AOS-OpenAI-Bearer` для OpenAI API.
+
+
 
 

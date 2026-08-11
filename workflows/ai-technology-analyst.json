@@ -1,0 +1,2223 @@
+{
+  "name": "AI Technology Analyst",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "b689dca8-bc0f-4e5f-998e-9fa5c3ee31ad",
+      "name": "Start Technology Analysis",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        176
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0",
+          "cachedResultName": "n8n AI Opportunities Monitor (Моніторинг можливостей для n8n та AI)"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 1001,
+          "cachedResultName": "News (Новини)"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "detectAutomatically"
+            }
+          },
+          "outputFormatting": {
+            "values": {
+              "general": "UNFORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "3498b304-6786-49ba-8947-e1de5a1a9f5a",
+      "name": "Read News",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        176
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9jvShELJ8qb6cS8M",
+          "name": "Potik_AOS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json[\"review_status (Статус перевірки)\"] }}",
+              "rightValue": "new",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              },
+              "id": "65fa521f-04bc-4f09-aed7-4e6ce062d467"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+
+          "ignoreCase": true
+        }
+      },
+      "id": "a8c44380-6eb6-4961-b4c9-166522d2da44",
+      "name": "Keep New News",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        448,
+        272
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.output.is_relevant }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              },
+              "id": "52e79ae5-3973-4593-a122-a634b57ecf75"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "id": "6b7833b1-36ee-42d2-bbe9-ce5a7963d67c",
+      "name": "Keep Relevant News",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        1792,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "tech_signal_id (ID технологічного сигналу)",
+              "value": "={{ 'TS-' + $json.output.signal_key }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "analysis_date (Дата аналізу)",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "source_news_ids (ID вихідних новин)",
+              "value": "={{ String($('Keep New News').item.json[\"news_id (ID новини)\"]) }}",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "technology (Технологія)",
+              "value": "={{ $json.output.technology }}",
+              "type": "string"
+            },
+            {
+              "id": "5",
+              "name": "vendor (Постачальник)",
+              "value": "={{ $json.output.vendor }}",
+              "type": "string"
+
+            },
+            {
+              "id": "6",
+              "name": "signal_type (Тип сигналу)",
+              "value": "={{ $json.output.signal_type }}",
+              "type": "string"
+            },
+            {
+              "id": "7",
+              "name": "new_capability (Нова можливість)",
+              "value": "={{ $json.output.new_capability }}",
+              "type": "string"
+            },
+            {
+              "id": "8",
+              "name": "what_changed (Що змінилося)",
+              "value": "={{ $json.output.what_changed }}",
+              "type": "string"
+            },
+            {
+              "id": "9",
+              "name": "business_use_case (Бізнес-застосування)",
+              "value": "={{ $json.output.business_use_cases.join('\\n') }}",
+              "type": "string"
+            },
+            {
+              "id": "10",
+              "name": "target_customer (Цільовий клієнт)",
+              "value": "={{ $json.output.target_customer }}",
+              "type": "string"
+            },
+            {
+              "id": "11",
+              "name": "n8n_fit_score (Оцінка сумісності з n8n)",
+              "value": "={{ $json.output.n8n_fit_score }}",
+              "type": "number"
+            },
+            {
+              "id": "12",
+              "name": "automation_potential_score (Потенціал автоматизації)",
+              "value": "={{ $json.output.automation_potential_score }}",
+              "type": "number"
+            },
+            {
+              "id": "13",
+              "name": "content_potential_score (Контент-потенціал)",
+              "value": "={{ $json.output.content_potential_score }}",
+              "type": "number"
+            },
+            {
+              "id": "14",
+              "name": "portfolio_potential_score (Потенціал для портфоліо)",
+              "value": "={{ $json.output.portfolio_potential_score }}",
+              "type": "number"
+            },
+            {
+              "id": "15",
+              "name": "technology_score (Загальна оцінка технології)",
+              "value": "={{ Math.round(($json.output.n8n_fit_score + $json.output.automation_potential_score + $json.output.content_potential_score + $json.output.portfolio_potential_score) / 4) }}",
+              "type": "number"
+            },
+            {
+              "id": "16",
+              "name": "maturity (Зрілість)",
+              "value": "={{ $json.output.maturity }}",
+              "type": "string"
+            },
+            {
+              "id": "17",
+              "name": "common_integrations (Типові інтеграції)",
+              "value": "={{ $json.output.potential_integrations.join('\\n') }}",
+              "type": "string"
+            },
+            {
+              "id": "18",
+              "name": "limitations_risks (Обмеження та ризики)",
+              "value": "={{ $json.output.limitations.join('\\n') }}",
+              "type": "string"
+            },
+            {
+
+              "id": "19",
+              "name": "evidence_urls (Посилання на джерела)",
+              "value": "={{ $('Keep New News').item.json[\"url (Посилання)\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "20",
+              "name": "ai_summary (AI-висновок)",
+              "value": "={{ $json.output.ai_summary }}",
+              "type": "string"
+            },
+            {
+              "id": "21",
+              "name": "confidence_score (Рівень впевненості)",
+              "value": "={{ $json.output.confidence_score }}",
+              "type": "number"
+            },
+            {
+              "id": "22",
+              "name": "status (Статус)",
+              "value": "new",
+              "type": "string"
+            },
+            {
+              "id": "23",
+              "name": "notes (Примітки)",
+              "value": "={{ 'Created from News ID ' + $('Keep New News').item.json[\"news_id (ID новини)\"] }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "id": "f746f15b-f192-4989-a2f1-42ccb5a93b14",
+      "name": "Prepare Tech Signal Row",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2464,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0",
+          "cachedResultName": "n8n AI Opportunities Monitor (Моніторинг можливостей для n8n та AI)"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 3001,
+          "cachedResultName": "Tech_Signals (Технологічні сигнали)"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": [
+            {
+              "id": "tech_signal_id (ID технологічного сигналу)",
+              "displayName": "tech_signal_id (ID технологічного сигналу)",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "analysis_date (Дата аналізу)",
+              "displayName": "analysis_date (Дата аналізу)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+
+            },
+            {
+              "id": "source_news_ids (ID вихідних новин)",
+              "displayName": "source_news_ids (ID вихідних новин)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "technology (Технологія)",
+              "displayName": "technology (Технологія)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "vendor (Постачальник)",
+              "displayName": "vendor (Постачальник)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "signal_type (Тип сигналу)",
+              "displayName": "signal_type (Тип сигналу)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "new_capability (Нова можливість)",
+              "displayName": "new_capability (Нова можливість)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "what_changed (Що змінилося)",
+              "displayName": "what_changed (Що змінилося)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "business_use_case (Бізнес-застосування)",
+              "displayName": "business_use_case (Бізнес-застосування)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "target_customer (Цільовий клієнт)",
+              "displayName": "target_customer (Цільовий клієнт)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "n8n_fit_score (Оцінка сумісності з n8n)",
+              "displayName": "n8n_fit_score (Оцінка сумісності з n8n)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "automation_potential_score (Потенціал автоматизації)",
+              "displayName": "automation_potential_score (Потенціал автоматизації)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "content_potential_score (Контент-потенціал)",
+              "displayName": "content_potential_score (Контент-потенціал)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "portfolio_potential_score (Потенціал для портфоліо)",
+              "displayName": "portfolio_potential_score (Потенціал для портфоліо)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "technology_score (Загальна оцінка технології)",
+              "displayName": "technology_score (Загальна оцінка технології)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "maturity (Зрілість)",
+              "displayName": "maturity (Зрілість)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "common_integrations (Типові інтеграції)",
+              "displayName": "common_integrations (Типові інтеграції)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "limitations_risks (Обмеження та ризики)",
+              "displayName": "limitations_risks (Обмеження та ризики)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "evidence_urls (Посилання на джерела)",
+              "displayName": "evidence_urls (Посилання на джерела)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "ai_summary (AI-висновок)",
+              "displayName": "ai_summary (AI-висновок)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "confidence_score (Рівень впевненості)",
+              "displayName": "confidence_score (Рівень впевненості)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "status (Статус)",
+              "displayName": "status (Статус)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "notes (Примітки)",
+              "displayName": "notes (Примітки)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ],
+          "matchingColumns": [
+            "tech_signal_id (ID технологічного сигналу)"
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "locationDefine": {
+            "values": {}
+          },
+          "handlingExtraData": "ignoreIt",
+          "useAppend": true
+        }
+      },
+      "id": "ac7f6e3f-f84b-4b62-95df-f4fa2d065bd3",
+      "name": "Write Tech Signal",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3136,
+        224
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9jvShELJ8qb6cS8M",
+          "name": "Potik_AOS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "news_id (ID новини)",
+              "value": "={{ $('Keep New News').item.json[\"news_id (ID новини)\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "review_status (Статус перевірки)",
+              "value": "irrelevant",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "updated_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "id": "17127078-ef1a-4958-93cb-468d9f46d459",
+      "name": "Prepare Irrelevant Update",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3360,
+        32
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0",
+          "cachedResultName": "n8n AI Opportunities Monitor (Моніторинг можливостей для n8n та AI)"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 1001,
+          "cachedResultName": "News (Новини)"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "news_id (ID новини)"
+          ],
+          "schema": [
+            {
+              "id": "news_id (ID новини)",
+              "displayName": "news_id (ID новини)",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "review_status (Статус перевірки)",
+              "displayName": "review_status (Статус перевірки)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "locationDefine": {
+            "values": {}
+          },
+          "handlingExtraData": "ignoreIt"
+        }
+      },
+      "id": "4d62b3b5-5e1a-4cf1-9df1-c03285d49d85",
+      "name": "Mark News Irrelevant",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+
+        3584,
+        32
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9jvShELJ8qb6cS8M",
+          "name": "Potik_AOS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "news_id (ID новини)",
+              "value": "={{ String($json[\"source_news_ids (ID вихідних новин)\"] ?? \"\").split(\",\")[0].trim() }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "review_status (Статус перевірки)",
+              "value": "analyzed",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "updated_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "id": "c13410bd-5aa1-4bca-9442-8497edade56c",
+      "name": "Prepare Analyzed Update",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3360,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0",
+          "cachedResultName": "n8n AI Opportunities Monitor (Моніторинг можливостей для n8n та AI)"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 1001,
+          "cachedResultName": "News (Новини)"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "news_id (ID новини)"
+          ],
+          "schema": [
+            {
+              "id": "news_id (ID новини)",
+              "displayName": "news_id (ID новини)",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "review_status (Статус перевірки)",
+
+              "displayName": "review_status (Статус перевірки)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "locationDefine": {
+            "values": {}
+          },
+          "handlingExtraData": "ignoreIt"
+        }
+      },
+      "id": "4cace3b1-2607-451a-b5fd-6349dcc024b5",
+      "name": "Mark News Analyzed",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3584,
+        224
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9jvShELJ8qb6cS8M",
+          "name": "Potik_AOS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0",
+          "cachedResultName": "n8n AI Opportunities Monitor (Моніторинг можливостей для n8n та AI)"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 3001,
+          "cachedResultName": "Tech_Signals (Технологічні сигнали)"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "tech_signal_id (ID технологічного сигналу)",
+              "lookupValue": "={{ $json[\"tech_signal_id (ID технологічного сигналу)\"] }}"
+            }
+          ]
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "detectAutomatically"
+            }
+          },
+          "outputFormatting": {
+            "values": {
+              "general": "UNFORMATTED_VALUE",
+              "date": "FORMATTED_STRING"
+            }
+          }
+        }
+      },
+      "id": "8de6b2d9-8a4a-4930-8b13-bd015aa13d9a",
+      "name": "Find Existing Tech Signal",
+      "type": "n8n-nodes-base.googleSheets",
+
+      "typeVersion": 4.7,
+      "position": [
+        2688,
+        320
+      ],
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9jvShELJ8qb6cS8M",
+          "name": "Potik_AOS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const keywordGroups = [\n  { name: 'core', weight: 5, keywords: ['n8n', 'ai automation', 'ai agent', 'ai agents', 'agentic ai', 'agentic automation', 'workflow automation', 'business process automation', 'ai integration', 'agent orchestration'] },\n  { name: 'agents_mcp', weight: 4, keywords: ['model context protocol', 'mcp', 'mcp server', 'mcp client', 'mcp tools', 'multi-agent', 'autonomous agent', 'agent framework', 'agent tools', 'tool calling', 'function calling', 'computer use', 'browser agent', 'agent memory', 'agent skills'] },\n  { name: 'ai_development', weight: 3, keywords: ['vibe coding', 'ai coding', 'agentic coding', 'coding agent', 'ai ide', 'ai app builder', 'codex', 'claude code', 'cursor', 'windsurf', 'replit agent', 'github copilot', 'gemini cli', 'openai', 'anthropic', 'claude', 'gemini'] },\n  { name: 'frameworks_tools', weight: 3, keywords: ['langchain', 'langgraph', 'crewai', 'llamaindex', 'openai agents sdk', 'google adk', 'make.com', 'zapier', 'activepieces'] },\n  { name: 'llm_infrastructure', weight: 2, keywords: ['llm integration', 'llm automation', 'rag', 'vector database', 'embeddings', 'structured output', 'context engineering', 'semantic search', 'knowledge base'] },\n  { name: 'business_automation', weight: 2, keywords: ['crm automation', 'sales automation', 'lead automation', 'lead qualification', 'marketing automation', 'customer support automation', 'document automation', 'document processing', 'content automation', 'email automation', 'reporting automation', 'e-commerce automation'] },\n  { name: 'technology_event', weight: 1, keywords: ['released', 'launch', 'launched', 'introducing', 'new feature', 'new integration', 'new api', 'new model', 'update', 'changelog', 'beta', 'general availability', 'open source', 'sdk', 'connector', 'integration'] },\n];\nconst MIN_SCORE = 5;\nconst escapeRegExp = value => value.replace(/[-/\\\\^$*+?.()|[\\]{}]/g, '\\\\$&');\nconst hasKeyword = (text, keyword) => new RegExp('(^|[^a-z0-9])' + escapeRegExp(keyword) + '($|[^a-z0-9])', 'i').test(text);\nreturn items.map((item, index) => {\n  const data = item.json;\n  const text = [data['title (Заголовок)'], data['description (Опис)'], data['search_text (Текст для пошуку)'], data['categories (Категорії)'], data['source_name (Назва джерела)']].filter(Boolean).join(' ').toLowerCase();\n  let score = 0;\n  const matchedKeywords = [];\n  const matchedGroups = [];\n  for (const group of keywordGroups) {\n    let groupMatched = false;\n    for (const keyword of group.keywords) {\n      if (hasKeyword(text, keyword)) {\n        score += group.weight;\n        matchedKeywords.push(keyword);\n        groupMatched = true;\n      }\n    }\n    if (groupMatched) matchedGroups.push(group.name);\n  }\n  return { json: { ...data, keyword_score: score, matched_keywords: [...new Set(matchedKeywords)], matched_groups: [...new Set(matchedGroups)], keyword_relevant: score >= MIN_SCORE }, pairedItem: item.pairedItem ?? { item: index } };\n});"
+      },
+      "id": "739550aa-9ea3-4ed2-bc99-4d0175b14d3b",
+      "name": "Rule-Based Technology Filter",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "combinator": "and",
+          "options": {
+            "caseSensitive": false,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.keyword_relevant }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "true"
+              }
+            }
+          ]
+        },
+        "options": {
+          "ignoreCase": true
+        }
+      },
+      "id": "bc06894e-2706-4fa0-8947-b009ac26c5f4",
+      "name": "Pass Keyword Threshold",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        896,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "maxItems": 10
+      },
+      "id": "b14002b7-824c-4301-bd1b-56332faed158",
+      "name": "Limit AI Candidates",
+      "type": "n8n-nodes-base.limit",
+      "typeVersion": 1,
+      "position": [
+        1120,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "news_id (ID новини)",
+
+              "value": "={{ $json[\"news_id (ID новини)\"] }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "review_status (Статус перевірки)",
+              "value": "keyword_filtered",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "updated_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "id": "b670ecad-8854-41fb-958e-155d0e7a99f3",
+      "name": "Prepare Keyword Filtered Update",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3360,
+        528
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 1001,
+          "cachedResultName": "News (Новини)"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "news_id (ID новини)"
+          ],
+          "schema": [
+            {
+              "id": "news_id (ID новини)",
+              "displayName": "news_id (ID новини)",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "review_status (Статус перевірки)",
+              "displayName": "review_status (Статус перевірки)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "locationDefine": {
+            "values": {}
+          },
+          "handlingExtraData": "ignoreIt"
+        }
+      },
+      "id": "743c9e83-ce1e-4c2d-9a28-d17f62739398",
+      "name": "Mark News Keyword Filtered",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3584,
+        528
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9jvShELJ8qb6cS8M",
+          "name": "Potik_AOS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "run_id",
+              "value": "={{ 'ATA-' + $execution.id }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "n8n_execution_id",
+              "value": "={{ String($execution.id) }}",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "workflow_name",
+              "value": "={{ $workflow.name }}",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "workflow_category",
+              "value": "ai_analysis",
+              "type": "string"
+            },
+            {
+              "id": "5",
+              "name": "trigger_type",
+              "value": "={{ $execution.mode }}",
+              "type": "string"
+            },
+            {
+              "id": "6",
+              "name": "started_at",
+              "value": "={{ $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "7",
+              "name": "run_status",
+              "value": "started",
+              "type": "string"
+            },
+            {
+              "id": "8",
+              "name": "items_input",
+              "value": "={{ $json.items_input }}",
+              "type": "number"
+            },
+            {
+              "id": "9",
+              "name": "items_processed",
+              "value": 0,
+              "type": "number"
+
+            },
+            {
+              "id": "10",
+              "name": "items_created",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "11",
+              "name": "items_updated",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "12",
+              "name": "items_skipped",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "13",
+              "name": "items_failed",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "14",
+              "name": "ai_calls",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "15",
+              "name": "model_name",
+              "value": "gpt-5.4-mini",
+              "type": "string"
+            },
+            {
+              "id": "16",
+              "name": "input_tokens",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "17",
+              "name": "output_tokens",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "18",
+              "name": "total_tokens",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "19",
+              "name": "estimated_cost_usd",
+              "value": 0,
+              "type": "number"
+            },
+            {
+              "id": "20",
+              "name": "run_metadata",
+              "value": "={{ JSON.stringify({ filter_threshold: 5, batch_limit: 10 }) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "id": "76b065a5-c702-45fe-af41-d1095f3eb54c",
+      "name": "Prepare Analyst Run Start",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        672,
+        0
+
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "return [{ json: { items_input: $input.all().length } }];"
+      },
+      "id": "9fec7647-0c0b-4f48-aac4-5b35193715da",
+      "name": "Count News Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const countItems = (nodeName) => {\n  try {\n    return $(nodeName).all().length;\n  } catch {\n    return 0;\n  }\n};\n\nconst sumField = (nodeName, fieldName) => {\n  try {\n    return $(nodeName).all().reduce(\n      (sum, item) => sum + Number(item.json[fieldName] ?? 0),\n      0,\n    );\n  } catch {\n    return 0;\n  }\n};\n\nconst run = $('Prepare Analyst Run Start').first().json;\nconst keywordFiltered = countItems('Mark News Keyword Filtered');\nconst irrelevant = countItems('Mark News Irrelevant');\nconst analyzed = countItems('Mark News Analyzed');\nconst classified = countItems('Normalize HTTP Relevance');\nconst signalsWritten = countItems('Write Tech Signal');\n\nconst inputTokens =\n  sumField('Normalize HTTP Relevance', 'relevance_input_tokens') +\n  sumField('Normalize HTTP Tech Signal', 'analysis_input_tokens');\nconst cachedInputTokens =\n  sumField('Normalize HTTP Relevance', 'relevance_cached_input_tokens') +\n  sumField('Normalize HTTP Tech Signal', 'analysis_cached_input_tokens');\nconst outputTokens =\n  sumField('Normalize HTTP Relevance', 'relevance_output_tokens') +\n  sumField('Normalize HTTP Tech Signal', 'analysis_output_tokens');\nconst totalTokens =\n  sumField('Normalize HTTP Relevance', 'relevance_total_tokens') +\n  sumField('Normalize HTTP Tech Signal', 'analysis_total_tokens');\n\nconst INPUT_RATE_PER_MILLION = 0.75;\nconst CACHED_INPUT_RATE_PER_MILLION = 0.075;\nconst OUTPUT_RATE_PER_MILLION = 4.50;\nconst billableInputTokens = Math.max(0, inputTokens - cachedInputTokens);\nconst estimatedCostUsd = Number((\n  (billableInputTokens / 1_000_000) * INPUT_RATE_PER_MILLION +\n  (cachedInputTokens / 1_000_000) * CACHED_INPUT_RATE_PER_MILLION +\n  (outputTokens / 1_000_000) * OUTPUT_RATE_PER_MILLION\n).toFixed(8));\n\nconst finishedAt = $now.toISO();\nconst durationSeconds = Math.max(\n  0,\n  Math.round($now.diff(DateTime.fromISO(run.started_at), 'seconds').seconds),\n);\n\nreturn [{\n  json: {\n    run_id: run.run_id,\n    n8n_execution_id: run.n8n_execution_id,\n    workflow_name: run.workflow_name,\n    workflow_category: run.workflow_category,\n    trigger_type: run.trigger_type,\n    started_at: run.started_at,\n    finished_at: finishedAt,\n    duration_seconds: durationSeconds,\n    run_status: 'success',\n    items_input: run.items_input,\n    items_processed: keywordFiltered + irrelevant + analyzed,\n    items_created: 0,\n    items_updated: 0,\n    items_skipped: keywordFiltered + irrelevant,\n    items_failed: 0,\n    ai_calls: classified + signalsWritten,\n    model_name: run.model_name,\n    input_tokens: inputTokens,\n    output_tokens: outputTokens,\n    total_tokens: totalTokens,\n    estimated_cost_usd: estimatedCostUsd,\n    run_metadata: JSON.stringify({\n      filter_threshold: 5,\n      batch_limit: 10,\n      tech_signals_written: signalsWritten,\n      relevance_calls: classified,\n      signal_analysis_calls: signalsWritten,\n      cached_input_tokens: cachedInputTokens,\n      pricing_usd_per_million: {\n        input: INPUT_RATE_PER_MILLION,\n        cached_input: CACHED_INPUT_RATE_PER_MILLION,\n        output: OUTPUT_RATE_PER_MILLION,\n      },\n      finalization_scope: 'normal_terminal_paths',\n    }),\n  },\n}];"
+      },
+      "id": "9b0cb056-b480-4e4c-b493-6d419f30141e",
+      "name": "Prepare Analyst Run Final",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3808,
+        224
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "const ID = 'tech_signal_id (ID технологічного сигналу)';\nconst SOURCES = 'source_news_ids (ID вихідних новин)';\n\nconst splitIds = (value) =>\n  String(value ?? '')\n    .split(',')\n    .map(id => id.trim())\n    .filter(Boolean);\n\n// Lookup can return one blank item when no signals exist yet.\n// Build an explicit map by ID instead of relying on n8n's ambiguous .item pairing.\nconst existingSourcesById = new Map();\nfor (const item of $input.all()) {\n  const record = item.json;\n  if (!record[ID]) continue;\n\n  const ids = existingSourcesById.get(record[ID]) ?? [];\n  existingSourcesById.set(record[ID], [...ids, ...splitIds(record[SOURCES])]);\n}\n\nreturn $('Prepare Tech Signal Row').all().map((item, index) => {\n  const current = item.json;\n  const mergedIds = [\n    ...new Set([\n      ...splitIds(current[SOURCES]),\n      ...(existingSourcesById.get(current[ID]) ?? []),\n    ]),\n  ];\n\n  return {\n    json: {\n      ...current,\n      [SOURCES]: mergedIds.join(','),\n    },\n    pairedItem: { item: index },\n  };\n});"
+      },
+      "id": "dff5d253-8333-4686-a28a-4a5acec8e9f6",
+      "name": "Merge Signal Sources Safely",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2912,
+        320
+      ],
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "jsCode": "const run = $('Prepare Analyst Run Start').first().json;\nconst source = $input.first().json;\nconst message = source.error?.message ?? source.message ?? 'Unhandled workflow error';\nconst finishedAt = $now.toISO();\nconst durationSeconds = Math.max(\n  0,\n  Math.round($now.diff(DateTime.fromISO(run.started_at), 'seconds').seconds),\n);\n\nreturn [{\n  json: {\n    ...run,\n    finished_at: finishedAt,\n    duration_seconds: durationSeconds,\n    run_status: 'failed',\n    items_failed: 1,\n    error_message: message,\n    run_metadata: JSON.stringify({\n      filter_threshold: 5,\n      batch_limit: 10,\n      failed_node: 'Merge Signal Sources Safely',\n      error: message,\n    }),\n  },\n}];"
+      },
+      "id": "2b0fd211-274b-4389-8bce-4dd910c25ac2",
+      "name": "Prepare Analyst Run Failure",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3808,
+        480
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ ({\n      model: \"gpt-5.4-mini\",\n      store: false,\n      max_output_tokens: 220,\n      instructions: \"You are an AI Technology Analyst. Assess only the supplied news material. Return is_relevant=true only for concrete technology changes or practical capabilities related to n8n, AI automation, AI agents, integrations, Model Context Protocol (MCP), vibe coding, AI coding tools, or adjacent enabling technologies. General company news, broad opinions, unrelated research, education stories, and incidents without a new capability are irrelevant. Do not invent facts. Write reason in Ukrainian.\",\n      input: \"Title: \" + ($json[\"title (Заголовок)\"] ?? \"\") + \"\\n\\nDescription: \" + ($json[\"description (Опис)\"] ?? \"\") + \"\\n\\nCategories: \" + ($json[\"categories (Категорії)\"] ?? \"\") + \"\\nSource: \" + ($json[\"source_name (Назва джерела)\"] ?? \"\") + \"\\n\\nKeyword pre-filter score: \" + ($json.keyword_score ?? \"\") + \"\\nMatched groups: \" + (($json.matched_groups ?? []).join(\", \")) + \"\\nMatched keywords: \" + (($json.matched_keywords ?? []).join(\", \")),\n      text: {\n        format: {\n          type: \"json_schema\",\n          name: \"news_relevance\",\n          strict: true,\n          schema: {\n            type: \"object\",\n            additionalProperties: false,\n            properties: {\n              is_relevant: { type: \"boolean\", description: \"True only for relevant technology news.\" },\n              reason: { type: \"string\", description: \"Concise evidence-based explanation in Ukrainian.\" },\n              confidence: { type: \"number\", minimum: 0, maximum: 1, description: \"Confidence based only on supplied news fields.\" }\n            },\n            required: [\"is_relevant\",\"reason\",\"confidence\"]\n          }\n        }\n      }\n    }) }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 400
+            }
+          },
+
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 60000
+        }
+      },
+      "id": "19876330-13a4-4545-bebb-cf04f6863b87",
+      "name": "Classify News via HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1344,
+        128
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "aCOn36vzIzYR3Ql6",
+          "name": "Potik_AOS-OpenAI"
+        },
+        "httpBearerAuth": {
+          "id": "Cg9ZPI0VEC5qogO8",
+          "name": "Potik_AOS-OpenAI-Bearer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "a1",
+              "name": "output",
+              "type": "object",
+              "value": "={{ JSON.parse($json.output?.[0]?.content?.find(part => part.type === \"output_text\")?.text ?? \"{}\") }}"
+            },
+            {
+              "id": "a2",
+              "name": "relevance_input_tokens",
+              "type": "number",
+              "value": "={{ $json.usage?.input_tokens ?? 0 }}"
+            },
+            {
+              "id": "a3",
+              "name": "relevance_output_tokens",
+              "type": "number",
+              "value": "={{ $json.usage?.output_tokens ?? 0 }}"
+            },
+            {
+              "id": "a4",
+              "name": "relevance_total_tokens",
+              "type": "number",
+              "value": "={{ $json.usage?.total_tokens ?? 0 }}"
+            },
+            {
+              "id": "a5",
+              "name": "relevance_model",
+              "type": "string",
+              "value": "={{ $json.model ?? '' }}"
+            },
+            {
+              "id": "a6",
+              "name": "news_title",
+              "type": "string",
+              "value": "={{ $(\"Keep New News\").item.json[\"title (Заголовок)\"] ?? \"\" }}"
+            },
+            {
+              "id": "a7",
+              "name": "news_description",
+              "type": "string",
+              "value": "={{ $(\"Keep New News\").item.json[\"description (Опис)\"] ?? \"\" }}"
+            },
+            {
+              "id": "a8",
+              "name": "news_categories",
+              "type": "string",
+
+              "value": "={{ $(\"Keep New News\").item.json[\"categories (Категорії)\"] ?? \"\" }}"
+            },
+            {
+              "id": "a9",
+              "name": "news_source",
+              "type": "string",
+              "value": "={{ $(\"Keep New News\").item.json[\"source_name (Назва джерела)\"] ?? \"\" }}"
+            },
+            {
+              "id": "a10",
+              "name": "news_url",
+              "type": "string",
+              "value": "={{ $(\"Keep New News\").item.json[\"url (Посилання)\"] ?? \"\" }}"
+            },
+            {
+              "id": "a11",
+              "name": "relevance_cached_input_tokens",
+              "type": "number",
+              "value": "={{ $json.usage?.input_tokens_details?.cached_tokens ?? 0 }}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {}
+      },
+      "id": "899f5bc5-491e-4360-aff9-de79e064a4f3",
+      "name": "Normalize HTTP Relevance",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1568,
+        128
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ ({\n  model: \"gpt-5.4-mini\",\n  store: false,\n  max_output_tokens: 900,\n  instructions: \"You are an AI Technology Analyst. Analyse only the supplied relevant technology news. Return a single valid JSON object with: technology, vendor, signal_type (feature|model|api|integration|agent_capability|mcp_server|automation_feature|platform_update|other), new_capability, what_changed, business_use_cases (array), n8n_fit_score, automation_potential_score, portfolio_potential_score, content_potential_score (all integers 1-10), maturity (Experimental|Early|Production-ready|Mature), potential_integrations (array), limitations (array), ai_summary, confidence_score (0-1), target_customer, signal_key. Use Ukrainian for explanatory fields. Do not invent facts.\",\n  input: \"Return JSON only. Analyse this technology news:\\n\\nTitle: \" + ($json.news_title || \"\") + \"\\n\\nDescription: \" + ($json.news_description || \"\") + \"\\n\\nCategories: \" + ($json.news_categories || \"\") + \"\\nSource: \" + ($json.news_source || \"\") + \"\\nURL: \" + ($json.news_url || \"\"),\n  text: { format: { type: \"json_object\" } }\n}) }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 500
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 90000
+        }
+      },
+      "id": "f75a309b-f772-4a00-ac3a-6c7461f3e565",
+      "name": "Analyse Tech Signal via HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2016,
+        320
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 3000,
+      "credentials": {
+        "httpBearerAuth": {
+
+          "id": "Cg9ZPI0VEC5qogO8",
+          "name": "Potik_AOS-OpenAI-Bearer"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "output",
+              "value": "={{ JSON.parse($json.output[0].content[0].text) }}",
+              "type": "object"
+            },
+            {
+              "id": "2",
+              "name": "analysis_input_tokens",
+              "value": "={{ $json.usage.input_tokens ?? 0 }}",
+              "type": "number"
+            },
+            {
+              "id": "3",
+              "name": "analysis_output_tokens",
+              "value": "={{ $json.usage.output_tokens ?? 0 }}",
+              "type": "number"
+            },
+            {
+              "id": "4",
+              "name": "analysis_total_tokens",
+              "value": "={{ $json.usage.total_tokens ?? 0 }}",
+              "type": "number"
+            },
+            {
+              "id": "5",
+              "name": "analysis_model",
+              "value": "={{ $json.model ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "6",
+              "name": "analysis_cached_input_tokens",
+              "type": "number",
+              "value": "={{ $json.usage?.input_tokens_details?.cached_tokens ?? 0 }}"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "id": "8cb867e6-5d14-48e5-adaa-1dc52b384bab",
+      "name": "Normalize HTTP Tech Signal",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2240,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "run_id (ID запуску)",
+              "value": "={{ $json.run_id ?? ('EXT-' + $execution.id) }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "n8n_execution_id (ID виконання n8n)",
+              "value": "={{ String($json.n8n_execution_id ?? '') }}",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "workflow_name (Назва workflow)",
+
+              "value": "={{ $json.workflow_name ?? 'Unknown workflow' }}",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "workflow_category (Категорія workflow)",
+              "value": "={{ $json.workflow_category ?? 'uncategorized' }}",
+              "type": "string"
+            },
+            {
+              "id": "5",
+              "name": "trigger_type (Тип запуску)",
+              "value": "={{ $json.trigger_type ?? 'subworkflow' }}",
+              "type": "string"
+            },
+            {
+              "id": "6",
+              "name": "started_at (Час початку)",
+              "value": "={{ $json.started_at ?? $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "7",
+              "name": "finished_at (Час завершення)",
+              "value": "={{ $json.finished_at ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "8",
+              "name": "duration_seconds (Тривалість, сек)",
+              "value": "={{ Number($json.duration_seconds ?? 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "9",
+              "name": "run_status (Статус запуску)",
+              "value": "={{ $json.run_status ?? 'success' }}",
+              "type": "string"
+            },
+            {
+              "id": "10",
+              "name": "items_input (Вхідних записів)",
+              "value": "={{ Number($json.items_input ?? 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "11",
+              "name": "items_processed (Оброблено записів)",
+              "value": "={{ Number($json.items_processed ?? 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "12",
+              "name": "items_created (Створено записів)",
+              "value": "={{ Number($json.items_created ?? 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "13",
+              "name": "items_updated (Оновлено записів)",
+              "value": "={{ Number($json.items_updated ?? 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "14",
+              "name": "items_skipped (Пропущено записів)",
+              "value": "={{ Number($json.items_skipped ?? 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "15",
+              "name": "items_failed (Помилок записів)",
+              "value": "={{ Number($json.items_failed ?? 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "16",
+              "name": "ai_calls (AI-викликів)",
+              "value": "={{ Number($json.ai_calls ?? 0) }}",
+              "type": "number"
+
+            },
+            {
+              "id": "17",
+              "name": "model_name (AI-модель)",
+              "value": "={{ $json.model_name ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "18",
+              "name": "input_tokens (Вхідні токени)",
+              "value": "={{ Number($json.input_tokens ?? 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "19",
+              "name": "output_tokens (Вихідні токени)",
+              "value": "={{ Number($json.output_tokens ?? 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "20",
+              "name": "total_tokens (Усього токенів)",
+              "value": "={{ Number($json.total_tokens ?? 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "21",
+              "name": "estimated_cost_usd (Орієнтовна вартість, USD)",
+              "value": "={{ Number($json.estimated_cost_usd ?? 0) }}",
+              "type": "number"
+            },
+            {
+              "id": "22",
+              "name": "error_message (Повідомлення про помилку)",
+              "value": "={{ $json.error_message ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "23",
+              "name": "run_metadata (Додаткові дані JSON)",
+              "value": "={{ typeof ($json.run_metadata ?? $json.metadata) === 'string' ? ($json.run_metadata ?? $json.metadata) : JSON.stringify($json.run_metadata ?? $json.metadata ?? {}) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "id": "40181f84-b125-4b45-84c6-e35cb692471d",
+      "name": "Normalize Run Metrics for Sheet",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4032,
+        320
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 4001,
+          "cachedResultName": "Automation_Runs (Запуски автоматизацій)"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "schema": [
+            {
+              "id": "run_id (ID запуску)",
+              "displayName": "run_id (ID запуску)",
+              "required": true,
+
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "n8n_execution_id (ID виконання n8n)",
+              "displayName": "n8n_execution_id (ID виконання n8n)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "workflow_name (Назва workflow)",
+              "displayName": "workflow_name (Назва workflow)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "workflow_category (Категорія workflow)",
+              "displayName": "workflow_category (Категорія workflow)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "trigger_type (Тип запуску)",
+              "displayName": "trigger_type (Тип запуску)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "started_at (Час початку)",
+              "displayName": "started_at (Час початку)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "finished_at (Час завершення)",
+              "displayName": "finished_at (Час завершення)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "duration_seconds (Тривалість, сек)",
+              "displayName": "duration_seconds (Тривалість, сек)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "run_status (Статус запуску)",
+              "displayName": "run_status (Статус запуску)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "items_input (Вхідних записів)",
+              "displayName": "items_input (Вхідних записів)",
+
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "items_processed (Оброблено записів)",
+              "displayName": "items_processed (Оброблено записів)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "items_created (Створено записів)",
+              "displayName": "items_created (Створено записів)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "items_updated (Оновлено записів)",
+              "displayName": "items_updated (Оновлено записів)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "items_skipped (Пропущено записів)",
+              "displayName": "items_skipped (Пропущено записів)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "items_failed (Помилок записів)",
+              "displayName": "items_failed (Помилок записів)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "ai_calls (AI-викликів)",
+              "displayName": "ai_calls (AI-викликів)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "model_name (AI-модель)",
+              "displayName": "model_name (AI-модель)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "input_tokens (Вхідні токени)",
+              "displayName": "input_tokens (Вхідні токени)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "output_tokens (Вихідні токени)",
+
+              "displayName": "output_tokens (Вихідні токени)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "total_tokens (Усього токенів)",
+              "displayName": "total_tokens (Усього токенів)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "estimated_cost_usd (Орієнтовна вартість, USD)",
+              "displayName": "estimated_cost_usd (Орієнтовна вартість, USD)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "error_message (Повідомлення про помилку)",
+              "displayName": "error_message (Повідомлення про помилку)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "id": "run_metadata (Додаткові дані JSON)",
+              "displayName": "run_metadata (Додаткові дані JSON)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ],
+          "matchingColumns": [
+            "run_id (ID запуску)"
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "locationDefine": {
+            "values": {}
+          },
+          "handlingExtraData": "ignoreIt",
+          "useAppend": true
+        }
+      },
+      "id": "0cdfcc14-fe80-4442-bda1-99a534cc2f89",
+      "name": "Write Automation Run Directly",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4256,
+        320
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "9jvShELJ8qb6cS8M",
+          "name": "Potik_AOS"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### AI Technology Analyst\n\n**Призначення:** знаходить нові технологічні новини та перетворює релевантні зміни на Tech Signals для бізнес-автоматизації.\n\n1. Читає необроблені записи з `News` і відсіює шум rule-based score (поріг 5).\n2. Аналізує до **10** кандидатів за запуск через OpenAI Responses API: релевантність → Tech Signal.\n3. Визначає technology, vendor, new capability, business use cases, інтеграції, maturity та оцінки для n8n/automation/content/portfolio.\n4. Записує результати в `Tech_Signals` і позначає джерело як analyzed / irrelevant / keyword_filtered.\n5. Підсумовує фактичні input/output/total tokens обох AI-викликів і напряму пише запуск у `Automation_Runs`.\n\n**Запуск:** Manual Trigger. API credential зберігається в n8n; токени не записуються у workflow.",
+        "height": 440,
+        "width": 520,
+        "color": 5
+      },
+      "id": "9ca64256-44e7-498b-a839-8c56e4c16df3",
+
+      "name": "Workflow Overview",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -400,
+        -480
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start Technology Analysis": {
+      "main": [
+        [
+          {
+            "node": "Read News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read News": {
+      "main": [
+        [
+          {
+            "node": "Keep New News",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Count News Input",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keep Relevant News": {
+      "main": [
+        [
+          {
+            "node": "Analyse Tech Signal via HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Irrelevant Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Irrelevant Update": {
+      "main": [
+        [
+          {
+            "node": "Mark News Irrelevant",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Tech Signal": {
+      "main": [
+        [
+          {
+            "node": "Prepare Analyzed Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Analyzed Update": {
+      "main": [
+
+        [
+          {
+            "node": "Mark News Analyzed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Tech Signal Row": {
+      "main": [
+        [
+          {
+            "node": "Find Existing Tech Signal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Find Existing Tech Signal": {
+      "main": [
+        [
+          {
+            "node": "Merge Signal Sources Safely",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Keep New News": {
+      "main": [
+        [
+          {
+            "node": "Rule-Based Technology Filter",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Analyst Run Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Rule-Based Technology Filter": {
+      "main": [
+        [
+          {
+            "node": "Pass Keyword Threshold",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pass Keyword Threshold": {
+      "main": [
+        [
+          {
+            "node": "Limit AI Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Keyword Filtered Update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Keyword Filtered Update": {
+      "main": [
+
+        [
+          {
+            "node": "Mark News Keyword Filtered",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Count News Input": {
+      "main": [
+        [
+          {
+            "node": "Prepare Analyst Run Start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark News Analyzed": {
+      "main": [
+        [
+          {
+            "node": "Prepare Analyst Run Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Analyst Run Final": {
+      "main": [
+        [
+          {
+            "node": "Normalize Run Metrics for Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark News Keyword Filtered": {
+      "main": [
+        [
+          {
+            "node": "Prepare Analyst Run Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark News Irrelevant": {
+      "main": [
+        [
+          {
+            "node": "Prepare Analyst Run Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Signal Sources Safely": {
+      "main": [
+        [
+          {
+            "node": "Write Tech Signal",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare Analyst Run Failure",
+            "type": "main",
+            "index": 0
+          }
+        ]
+
+      ]
+    },
+    "Prepare Analyst Run Failure": {
+      "main": [
+        [
+          {
+            "node": "Normalize Run Metrics for Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Classify News via HTTP": {
+      "main": [
+        [
+          {
+            "node": "Normalize HTTP Relevance",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limit AI Candidates": {
+      "main": [
+        [
+          {
+            "node": "Classify News via HTTP",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize HTTP Relevance": {
+      "main": [
+        [
+          {
+            "node": "Keep Relevant News",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyse Tech Signal via HTTP": {
+      "main": [
+        [
+          {
+            "node": "Normalize HTTP Tech Signal",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize HTTP Tech Signal": {
+      "main": [
+        [
+          {
+            "node": "Prepare Tech Signal Row",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize Run Metrics for Sheet": {
+      "main": [
+        [
+          {
+            "node": "Write Automation Run Directly",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": true,
+    "errorWorkflow": "O1hOri9GoDx7dVYv"
+  },
+  "versionId": "38e06172-ac7b-4aaf-8255-b09450149ce5",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp",
+    "instanceId": "bb694af3e2398a299c822b58122146a94ee4e139b1889e45404c58650db100a0"
+  },
+  "nodeGroups": [],
+  "id": "2m8YgfQaLbTEVKBX",
+  "tags": [
+    {
+      "updatedAt": "2026-07-31T16:21:46.822Z",
+      "createdAt": "2026-07-31T16:21:46.822Z",
+      "id": "97lwq5zLTxuLWSva",
+      "name": "analytics"
+    },
+    {
+      "updatedAt": "2026-07-19T08:36:04.506Z",
+      "createdAt": "2026-07-19T08:36:04.506Z",
+      "id": "BXc7teaa7F9B6EP2",
+      "name": "status:development"
+    },
+    {
+      "updatedAt": "2026-07-09T15:01:25.899Z",
+      "createdAt": "2026-07-09T14:53:25.688Z",
+      "id": "b4V3hh8bo10FI4UQ",
+      "name": "potik-aos"
+    }
+  ]
+}

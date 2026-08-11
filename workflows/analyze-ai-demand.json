@@ -1,13 +1,14 @@
-Exit code: 0
-Wall time: 1.2 seconds
-Total output lines: 1913
-Output:
 {
   "name": "Analyze AI demand from opportunities",
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "binaryMode": "separate"
+  },
   "nodes": [
     {
       "parameters": {},
-      "id": "b15d2f6f-9dfc-44d3-bd44-d92a17f83ab6",
       "name": "Start demand analysis",
       "type": "n8n-nodes-base.manualTrigger",
       "typeVersion": 1,
@@ -21,7 +22,7 @@ Output:
         "documentId": {
           "__rl": true,
           "mode": "id",
-          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0",
+          "value": "[REDACTED_GOOGLE_SHEET_ID]",
           "cachedResultName": "n8n AI Opportunities Monitor (Моніторинг можливостей для n8n та AI)"
         },
         "sheetName": {
@@ -38,7 +39,6 @@ Output:
           }
         }
       },
-      "id": "read-opportunities",
       "name": "Read opportunities",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
@@ -49,12 +49,6 @@ Output:
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 5000,
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "9jvShELJ8qb6cS8M",
-          "name": "Potik_AOS"
-        }
-      },
       "onError": "continueErrorOutput"
     },
     {
@@ -73,8 +67,7 @@ Output:
               "operator": {
                 "type": "string",
                 "operation": "notEquals"
-              },
-              "id": "332fe8db-43fe-420a-a96e-f2c6b4b14719"
+              }
             },
             {
               "leftValue": "={{ $json[\"description (Опис)\"] }}",
@@ -82,8 +75,7 @@ Output:
               "operator": {
                 "type": "string",
                 "operation": "notEquals"
-              },
-              "id": "adc6a63f-2f5d-410d-ba39-d509e9ecc499"
+              }
             }
           ],
           "combinator": "and"
@@ -92,7 +84,6 @@ Output:
           "ignoreCase": false
         }
       },
-      "id": "filter-valid-opportunities",
       "name": "Filter valid opportunities",
       "type": "n8n-nodes-base.filter",
       "typeVersion": 2.3,
@@ -106,13 +97,11 @@ Output:
         "assignments": {
           "assignments": [
             {
-              "id": "intent-class",
               "name": "intent_class",
               "value": "client_project",
               "type": "string"
             },
             {
-              "id": "analysis-status",
               "name": "analysis_status",
               "value": "ready_for_demand_analysis",
               "type": "string"
@@ -124,7 +113,6 @@ Output:
           "dotNotation": false
         }
       },
-      "id": "mark-client-project",
       "name": "Mark client project",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
@@ -139,7 +127,6 @@ Output:
         "combineBy": "combineByPosition",
         "options": {}
       },
-      "id": "combine-source-and-ai-signals",
       "name": "Combine source and AI signals",
       "type": "n8n-nodes-base.merge",
       "typeVersion": 3.2,
@@ -154,55 +141,46 @@ Output:
         "assignments": {
           "assignments": [
             {
-              "id": "demand-problem",
               "name": "demand_problem",
               "value": "={{ $('Combine source and AI signals').item.json.output.client_problem }}",
               "type": "string"
             },
             {
-              "id": "automation-type",
               "name": "automation_type",
               "value": "={{ $('Combine source and AI signals').item.json.output.automation_type }}",
               "type": "string"
             },
             {
-              "id": "technologies",
               "name": "technologies",
               "value": "={{ $('Combine source and AI signals').item.json.output.technologies.join(', ') }}",
               "type": "string"
             },
             {
-              "id": "required-skills",
               "name": "required_skills",
               "value": "={{ $('Combine source and AI signals').item.json.output.required_skills.join(', ') }}",
               "type": "string"
             },
             {
-              "id": "client-type",
               "name": "client_type",
               "value": "={{ $('Combine source and AI signals').item.json.output.client_type }}",
               "type": "string"
             },
             {
-              "id": "project-scope",
               "name": "project_scope",
               "value": "={{ $('Combine source and AI signals').item.json.output.project_scope }}",
               "type": "string"
             },
             {
-              "id": "potential-service",
               "name": "potential_service",
               "value": "={{ $('Combine source and AI signals').item.json.output.potential_service }}",
               "type": "string"
             },
             {
-              "id": "ai-confidence",
               "name": "ai_confidence",
               "value": "={{ $('Combine source and AI signals').item.json.output.confidence }}",
               "type": "number"
             },
             {
-              "id": "analysis-status",
               "name": "analysis_status",
               "value": "demand_signals_extracted",
               "type": "string"
@@ -216,7 +194,6 @@ Output:
           "dotNotation": false
         }
       },
-      "id": "flatten-demand-signals",
       "name": "Flatten demand signals",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
@@ -231,55 +208,46 @@ Output:
         "assignments": {
           "assignments": [
             {
-              "id": "days-since-published",
               "name": "days_since_published",
               "value": "={{ (() => { const published = $('Flatten demand signals').item.json[\"published_at (Дата публікації)\"]; const parsed = published ? DateTime.fromISO(published) : null; return parsed?.isValid ? Math.max(0, Math.floor(DateTime.now().diff(parsed, 'days').days)) : null })() }}",
               "type": "number"
             },
             {
-              "id": "budget-disclosed",
               "name": "budget_disclosed",
               "value": "={{ Number($('Flatten demand signals').item.json[\"budget_max (Максимальний бюджет)\"]) > 0 || Number($('Flatten demand signals').item.json[\"budget_min (Мінімальний бюджет)\"]) > 0 }}",
               "type": "boolean"
             },
             {
-              "id": "demand-score",
               "name": "demand_score",
               "value": "={{ (() => { const item=$('Flatten demand signals').item.json; const p=item[\"published_at (Дата публікації)\"]; const dt=p?DateTime.fromISO(p):null; const d=dt?.isValid?Math.max(0,Math.floor(DateTime.now().diff(dt,'days').days)):999; const fresh=d<=7?25:d<=30?18:d<=90?10:3; const has=Number(item[\"budget_min (Мінімальний бюджет)\"])>0||Number(item[\"budget_max (Максимальний бюджет)\"])>0; const scope=item.project_scope==='ongoing'?10:item.project_scope==='pilot'?7:5; const conf=Math.round(Math.max(0,Math.min(1,Number(item.ai_confidence)||0))*20); return Math.min(100,35+fresh+(has?15:5)+scope+conf) })() }}",
               "type": "number"
             },
             {
-              "id": "recent-30-days",
               "name": "recent_30_days",
               "value": "={{ (() => { const p=$('Flatten demand signals').item.json[\"published_at (Дата публікації)\"]; const dt=p?DateTime.fromISO(p):null; const d=dt?.isValid?Math.max(0,Math.floor(DateTime.now().diff(dt,'days').days)):999; return d<=30?1:0 })() }}",
               "type": "number"
             },
             {
-              "id": "previous-30-days",
               "name": "previous_30_days",
               "value": "={{ (() => { const p=$('Flatten demand signals').item.json[\"published_at (Дата публікації)\"]; const dt=p?DateTime.fromISO(p):null; const d=dt?.isValid?Math.max(0,Math.floor(DateTime.now().diff(dt,'days').days)):999; return d>30&&d<=60?1:0 })() }}",
               "type": "number"
             },
             {
-              "id": "budget-signal-score",
               "name": "budget_signal_score",
               "value": "={{ Number($('Flatten demand signals').item.json[\"budget_max (Максимальний бюджет)\"]) > 0 || Number($('Flatten demand signals').item.json[\"budget_min (Мінімальний бюджет)\"]) > 0 ? 100 : 0 }}",
               "type": "number"
             },
             {
-              "id": "budget-range",
               "name": "budget_range",
               "value": "={{ (() => { const j=$('Flatten demand signals').item.json; const min=j[\"budget_min (Мінімальний бюджет)\"]; const max=j[\"budget_max (Максимальний бюджет)\"]; const currency=j[\"currency (Валюта)\"] || 'currency unspecified'; return Number(min)>0 || Number(max)>0 ? currency + ': ' + (min || '?') + '–' + (max || '?') : 'not specified' })() }}",
               "type": "string"
             },
             {
-              "id": "score-method",
               "name": "demand_score_method",
               "value": "v1_recency_budget_scope_confidence",
               "type": "string"
             },
             {
-              "id": "analysis-status",
               "name": "analysis_status",
               "value": "demand_scored",
               "type": "string"
@@ -291,7 +259,6 @@ Output:
           "dotNotation": false
         }
       },
-      "id": "calculate-demand-score",
       "name": "Calculate demand score",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
@@ -378,7 +345,6 @@ Output:
           "skipEmptySplitFields": true
         }
       },
-      "id": "group-demand-by-automation-type",
       "name": "Group demand by automation type",
       "type": "n8n-nodes-base.summarize",
       "typeVersion": 1.1,
@@ -393,31 +359,26 @@ Output:
         "assignments": {
           "assignments": [
             {
-              "id": "project-count",
               "name": "project_count",
               "value": "={{ $('Group demand by automation type').item.json[\"count_opportunity_id_(ID_можливості)\"] }}",
               "type": "number"
             },
             {
-              "id": "demand-strength-score",
               "name": "demand_strength_score",
               "value": "={{ (() => { const group = $('Group demand by automation type').item.json; const count = Number(group[\"count_opportunity_id_(ID_можливості)\"]) || 0; const averageScore = Number(group.average_demand_score) || 0; return Math.min(100, Math.round((count * 15) + (averageScore * 0.4))) })() }}",
               "type": "number"
             },
             {
-              "id": "demand-strength",
               "name": "demand_strength",
               "value": "={{ (() => { const group = $('Group demand by automation type').item.json; const score = Math.min(100, Math.round(((Number(group[\"count_opportunity_id_(ID_можливості)\"]) || 0) * 15) + ((Number(group.average_demand_score) || 0) * 0.4))); return score >= 80 ? 'high' : score >= 60 ? 'medium' : 'emerging' })() }}",
               "type": "string"
             },
             {
-              "id": "trend-status",
               "name": "trend_status",
               "value": "={{ (() => { const group = $('Group demand by automation type').item.json; const recent = Number(group.sum_recent_30_days) || 0; const previous = Number(group.sum_previous_30_days) || 0; if (recent === 0 && previous === 0) return 'aging'; if (previous === 0 && recent > 0) return 'emerging'; const change = (recent - previous) / previous; if (change >= 0.25) return 'rising'; if (change <= -0.25) return 'declining'; return 'stable' })() }}",
               "type": "string"
             },
             {
-              "id": "analysis-status",
               "name": "analysis_status",
               "value": "grouped_and_scored",
               "type": "string"
@@ -429,7 +390,6 @@ Output:
           "dotNotation": false
         }
       },
-      "id": "score-demand-strength-and-trend",
       "name": "Score demand strength and trend",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
@@ -445,7 +405,7 @@ Output:
         "documentId": {
           "__rl": true,
           "mode": "id",
-          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0",
+          "value": "[REDACTED_GOOGLE_SHEET_ID]",
           "cachedResultName": "n8n AI Opportunities Monitor (Моніторинг можливостей для n8n та AI)"
         },
         "sheetName": {
@@ -482,28 +442,765 @@ Output:
           },
           "schema": [
             {
-              "id": "opportunity_id (ID можливості)",
               "displayName": "opportunity_id (ID можливості)",
               "required": true,
               "defaultMatch": true,
               "display": true,
               "type": "string",
-             …8061 tokens truncated…kflow.name }}"
+              "canBeUsedToMatch": true
             },
             {
-              "id": "category",
+              "displayName": "title (Назва)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "url (Посилання)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "published_at (Дата публікації)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "budget_min (Мінімальний бюджет)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "budget_max (Максимальний бюджет)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "currency (Валюта)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "client_problem (Проблема клієнта)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "automation_type (Тип автоматизації)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "demand_cluster (Кластер попиту)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "technologies (Технології)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "required_skills (Необхідні навички)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "client_type (Тип клієнта)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "urgency (Терміновість)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "ai_fit_score (Оцінка відповідності AI)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "potential_service (Потенційна послуга)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "included_in_report (Включено у звіт)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "exclusion_reason (Причина виключення)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "processed_at (Дата обробки)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "locationDefine": {
+            "values": {}
+          },
+          "useAppend": false
+        }
+      },
+      "name": "Upsert demand analysis rows",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3808,
+        144
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput",
+      "notes": "Upserts one analyzed opportunity per row using opportunity_id as the stable key. The branch originates before grouping because Demand Analysis stores individual records."
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "[REDACTED_GOOGLE_SHEET_ID]"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "list",
+          "value": 2002,
+          "cachedResultName": "Demand Report (Звіт про попит)"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "matchingColumns": [
+            "demand_cluster (Кластер попиту)"
+          ],
+          "value": {
+            "rank (Рейтинг)": "={{ $('Score demand strength and trend').all().filter(x => Number(x.json.demand_strength_score) > Number($('Score demand strength and trend').item.json.demand_strength_score)).length + 1 }}",
+            "demand_cluster (Кластер попиту)": "={{ $('Score demand strength and trend').item.json.automation_type }}",
+            "opportunities_count (Кількість можливостей)": "={{ $('Score demand strength and trend').item.json.project_count }}",
+            "demand_strength (Сила попиту)": "={{ $('Score demand strength and trend').item.json.demand_strength }}",
+            "demand_score (Оцінка попиту)": "={{ $('Score demand strength and trend').item.json.demand_strength_score }}",
+            "frequency_score (Оцінка частоти)": "={{ Math.min(100, Number($('Score demand strength and trend').item.json.project_count) * 20) }}",
+            "budget_score (Оцінка бюджету)": "={{ Math.round(Number($('Score demand strength and trend').item.json.average_budget_signal_score || 0)) }}",
+            "urgency_score (Оцінка терміновості)": "={{ Math.max(0, 100 - Math.min(100, Number($('Score demand strength and trend').item.json.min_days_since_published || 100) * 3)) }}",
+            "ai_fit_score (Оцінка відповідності AI)": "={{ Math.round(Number($('Score demand strength and trend').item.json.average_ai_confidence || 0) * 100) }}",
+            "trend (Тренд)": "={{ $('Score demand strength and trend').item.json.trend_status }}",
+            "recent_30_days_count (Кількість за останні 30 днів)": "={{ $('Score demand strength and trend').item.json.sum_recent_30_days }}",
+            "previous_30_days_count (Кількість за попередні 30 днів)": "={{ $('Score demand strength and trend').item.json.sum_previous_30_days }}",
+            "key_client_problems (Ключові проблеми клієнтів)": "={{ $('Score demand strength and trend').item.json.concatenated_demand_problem }}",
+            "top_technologies (Топ технології)": "={{ $('Score demand strength and trend').item.json.concatenated_technologies }}",
+            "top_required_skills (Топ необхідних навичок)": "={{ $('Score demand strength and trend').item.json.concatenated_required_skills }}",
+            "client_types (Типи клієнтів)": "={{ $('Score demand strength and trend').item.json.concatenated_client_type }}",
+            "budget_summary_by_currency (Підсумок бюджету за валютою)": "={{ $('Score demand strength and trend').item.json.concatenated_budget_range }}",
+            "potential_service (Потенційна послуга)": "={{ $('Score demand strength and trend').item.json.concatenated_potential_service }}",
+            "updated_at (Дата оновлення)": "={{ DateTime.now().toISO() }}"
+          },
+          "schema": [
+            {
+              "displayName": "rank (Рейтинг)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "demand_cluster (Кластер попиту)",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "displayName": "opportunities_count (Кількість можливостей)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "demand_strength (Сила попиту)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "demand_score (Оцінка попиту)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "frequency_score (Оцінка частоти)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "budget_score (Оцінка бюджету)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "urgency_score (Оцінка терміновості)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "ai_fit_score (Оцінка відповідності AI)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "trend (Тренд)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "recent_30_days_count (Кількість за останні 30 днів)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "previous_30_days_count (Кількість за попередні 30 днів)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "key_client_problems (Ключові проблеми клієнтів)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "top_technologies (Топ технології)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "top_required_skills (Топ необхідних навичок)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "client_types (Типи клієнтів)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "budget_summary_by_currency (Підсумок бюджету за валютою)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "potential_service (Потенційна послуга)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            },
+            {
+              "displayName": "updated_at (Дата оновлення)",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": false
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "locationDefine": {
+            "values": {}
+          },
+          "useAppend": false
+        }
+      },
+      "name": "Upsert demand report rows",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        3360,
+        -64
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "content": "### 1. Вхідні можливості\nРучний запуск читає всі записи з `Opportunities`. На етапі розробки аналіз обмежено тестовою вибіркою.",
+        "height": 150,
+        "width": 360,
+        "color": 5
+      },
+      "name": "Note · Intake",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -48,
+        -224
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### 2. Відсів шуму\nAI класифікує записи. Лише `client_project` — реальний запит клієнта — проходить далі; вакансії, пропозиції виконавців і нерелевантні записи відсіюються.",
+        "height": 170,
+        "width": 460,
+        "color": 5
+      },
+      "name": "Note · Triage",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        784,
+        -224
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### 3. AI-аналіз попиту\nВитягуємо проблему, тип автоматизації, технології, skills, тип клієнта, масштаб та потенційну послугу. Вихідні бюджет і URL зберігаються.",
+        "height": 170,
+        "width": 500,
+        "color": 5
+      },
+      "name": "Note · Extract",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1584,
+        -224
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### 4. Оцінка та групування\nРозраховуємо Demand Score, об’єднуємо схожі проєкти за типом автоматизації, визначаємо силу попиту й сигнал тренду.",
+        "height": 150,
+        "width": 470,
+        "color": 5
+      },
+      "name": "Note · Score",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2448,
+        -224
+      ]
+    },
+    {
+      "parameters": {
+        "content": "### 5. Результати\n`Demand Analysis` — індивідуальні можливості.\n`Demand Report` — агрегований ринковий звіт.\nОбидва записи оновлюються без дублів за своїми ключами.",
+        "height": 170,
+        "width": 460,
+        "color": 5
+      },
+      "name": "Note · Output",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2864,
+        448
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "error_stage",
+              "value": "={{ $json.error?.node?.name || $json.node?.name || 'unknown_node' }}",
+              "type": "string"
+            },
+            {
+              "name": "error_message",
+              "value": "={{ $json.error?.message || $json.message || 'Unknown execution error' }}",
+              "type": "string"
+            },
+            {
+              "name": "error_time",
+              "value": "={{ DateTime.now().toISO() }}",
+              "type": "string"
+            },
+            {
+              "name": "next_action",
+              "value": "Review the failed node, credentials, API quota, or spreadsheet access, then run the workflow again.",
+              "type": "string"
+            }
+          ]
+        },
+        "includeOtherFields": true,
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "name": "Capture analysis error",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        4032,
+        80
+      ],
+      "notes": "Receives Google Sheets error outputs after retries are exhausted. It preserves the original error payload so the failed step is visible in the execution."
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ ({\n    model: \"gpt-5.4-mini\",\n    store: false,\n    max_output_tokens: 100,\n    instructions: \"Classify the supplied opportunity only. Return client_project only when a client/company seeks to commission an AI automation, n8n workflow, AI agent, integration, consulting, or implementation project. Return client_hiring for employment hiring, provider_offer when a developer/agency offers services, and irrelevant otherwise. Do not invent facts.\",\n    input: \"Title: \" + ($json[\"title (Назва проєкту або вакансії)\"] ?? \"\") + \"\\n\\nDescription: \" + ($json[\"description (Опис)\"] ?? \"\"),\n    text: { format: { type: \"json_schema\", name: \"opportunity_intent\", strict: true, schema: { type: \"object\", additionalProperties: false, properties: { intent_class: { type: \"string\", enum: [\"client_project\",\"client_hiring\",\"provider_offer\",\"irrelevant\"] } }, required: [\"intent_class\"] } } }\n  }) }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 400
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 60000
+        }
+      },
+      "name": "Classify opportunity via HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        672,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "intent_class",
+              "type": "string",
+              "value": "={{ JSON.parse($json.output?.[0]?.content?.find(part => part.type === \"output_text\")?.text ?? \"{}\").intent_class ?? \"irrelevant\" }}"
+            },
+            {
+              "name": "intent_input_tokens",
+              "type": "number",
+              "value": "={{ $json.usage?.input_tokens ?? 0 }}"
+            },
+            {
+              "name": "intent_output_tokens",
+              "type": "number",
+              "value": "={{ $json.usage?.output_tokens ?? 0 }}"
+            },
+            {
+              "name": "intent_total_tokens",
+              "type": "number",
+              "value": "={{ $json.usage?.total_tokens ?? 0 }}"
+            },
+            {
+              "name": "intent_cached_input_tokens",
+              "type": "number",
+              "value": "={{ $json.usage?.input_tokens_details?.cached_tokens ?? 0 }}"
+            },
+            {
+              "name": "intent_model",
+              "type": "string",
+              "value": "={{ $json.model ?? '' }}"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "name": "Normalize opportunity intent usage",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        896,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "name": "Combine source and intent",
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        1120,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.intent_class }}",
+              "rightValue": "client_project",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {
+          "ignoreCase": false
+        }
+      },
+      "name": "Keep client projects",
+      "type": "n8n-nodes-base.filter",
+      "typeVersion": 2.3,
+      "position": [
+        1344,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ ({\n  model: \"gpt-5.4-mini\",\n  store: false,\n  max_output_tokens: 700,\n  instructions: \"You are an AI automation market analyst. Return one valid JSON object only with exactly these fields: client_problem (string), automation_type (one of ai_agent, workflow_automation, system_integration, lead_generation, customer_support, content_automation, data_research, other), technologies (string array), required_skills (string array), client_type (one of business_owner, agency, startup,enterprise,individual,not_specified), project_scope (one of one_off,ongoing,pilot,not_specified), potential_service (string), confidence (number 0 to 1). Extract only from the supplied opportunity. Do not invent facts. Use not_specified for unavailable string/enum values and [] for arrays. Keep values concise and in English.\",\n  input: \"Return JSON only.\\n\\nTitle: \" + ($json[\"title (Назва проєкту або вакансії)\"] ?? \"\") + \"\\n\\nDescription: \" + ($json[\"description (Опис)\"] ?? \"\"),\n  text: { format: { type: \"json_object\" } }\n}) }}",
+        "options": {
+          "batching": {
+            "batch": {
+              "batchSize": 1,
+              "batchInterval": 500
+            }
+          },
+          "response": {
+            "response": {
+              "responseFormat": "json"
+            }
+          },
+          "timeout": 90000
+        }
+      },
+      "name": "Extract demand signals via HTTP",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1792,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "output",
+              "type": "object",
+              "value": "={{ JSON.parse($json.output?.[0]?.content?.find(part => part.type === \"output_text\")?.text ?? \"{}\") }}"
+            },
+            {
+              "name": "analysis_input_tokens",
+              "type": "number",
+              "value": "={{ $json.usage?.input_tokens ?? 0 }}"
+            },
+            {
+              "name": "analysis_output_tokens",
+              "type": "number",
+              "value": "={{ $json.usage?.output_tokens ?? 0 }}"
+            },
+            {
+              "name": "analysis_total_tokens",
+              "type": "number",
+              "value": "={{ $json.usage?.total_tokens ?? 0 }}"
+            },
+            {
+              "name": "analysis_cached_input_tokens",
+              "type": "number",
+              "value": "={{ $json.usage?.input_tokens_details?.cached_tokens ?? 0 }}"
+            },
+            {
+              "name": "analysis_model",
+              "type": "string",
+              "value": "={{ $json.model ?? '' }}"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "name": "Normalize demand signals usage",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2016,
+        144
+      ]
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "name": "run_id",
+              "type": "string",
+              "value": "={{ 'ADA-' + $execution.id }}"
+            },
+            {
+              "name": "n8n_execution_id",
+              "type": "string",
+              "value": "={{ String($execution.id) }}"
+            },
+            {
+              "name": "workflow_name",
+              "type": "string",
+              "value": "={{ $workflow.name }}"
+            },
+            {
               "name": "workflow_category",
               "type": "string",
               "value": "ai_demand_analysis"
             },
             {
-              "id": "trigger",
               "name": "trigger_type",
               "type": "string",
               "value": "={{ $execution.mode }}"
             },
             {
-              "id": "started",
               "name": "started_at",
               "type": "string",
               "value": "={{ $now.toISO() }}"
@@ -514,7 +1211,6 @@ Output:
           "dotNotation": false
         }
       },
-      "id": "prepare-demand-run-start",
       "name": "Prepare demand run start",
       "type": "n8n-nodes-base.set",
       "typeVersion": 3.4,
@@ -527,7 +1223,6 @@ Output:
       "parameters": {
         "jsCode": "const safeItems = (nodeName) => {\n  try { return $(nodeName).all(); } catch { return []; }\n};\nconst sumField = (nodeName, fieldName) =>\n  safeItems(nodeName).reduce((sum, item) => sum + Number(item.json[fieldName] ?? 0), 0);\n\nconst run = $('Prepare demand run start').first().json;\nconst inputItems = safeItems('Read opportunities').length;\nconst validItems = safeItems('Filter valid opportunities').length;\nconst projectItems = safeItems('Keep client projects').length;\nconst intentCalls = safeItems('Normalize opportunity intent usage').length;\nconst analysisCalls = safeItems('Normalize demand signals usage').length;\nconst inputTokens = sumField('Normalize opportunity intent usage', 'intent_input_tokens') + sumField('Normalize demand signals usage', 'analysis_input_tokens');\nconst cachedInputTokens = sumField('Normalize opportunity intent usage', 'intent_cached_input_tokens') + sumField('Normalize demand signals usage', 'analysis_cached_input_tokens');\nconst outputTokens = sumField('Normalize opportunity intent usage', 'intent_output_tokens') + sumField('Normalize demand signals usage', 'analysis_output_tokens');\nconst totalTokens = sumField('Normalize opportunity intent usage', 'intent_total_tokens') + sumField('Normalize demand signals usage', 'analysis_total_tokens');\n\nconst INPUT_RATE_PER_MILLION = 0.75;\nconst CACHED_INPUT_RATE_PER_MILLION = 0.075;\nconst OUTPUT_RATE_PER_MILLION = 4.5;\nconst estimatedCostUsd = Number((\n  (Math.max(0, inputTokens - cachedInputTokens) / 1_000_000) * INPUT_RATE_PER_MILLION +\n  (cachedInputTokens / 1_000_000) * CACHED_INPUT_RATE_PER_MILLION +\n  (outputTokens / 1_000_000) * OUTPUT_RATE_PER_MILLION\n).toFixed(8));\nconst finishedAt = $now.toISO();\nconst durationSeconds = Math.max(0, Math.round($now.diff(DateTime.fromISO(run.started_at), 'seconds').seconds));\n\nreturn [{ json: {\n  'run_id (ID запуску)': run.run_id,\n  'n8n_execution_id (ID виконання n8n)': run.n8n_execution_id,\n  'workflow_name (Назва workflow)': run.workflow_name,\n  'workflow_category (Категорія workflow)': run.workflow_category,\n  'trigger_type (Тип запуску)': run.trigger_type,\n  'started_at (Час початку)': run.started_at,\n  'finished_at (Час завершення)': finishedAt,\n  'duration_seconds (Тривалість, сек)': durationSeconds,\n  'run_status (Статус запуску)': 'success',\n  'items_input (Вхідних записів)': inputItems,\n  'items_processed (Оброблено записів)': projectItems,\n  'items_created (Створено записів)': 0,\n  'items_updated (Оновлено записів)': projectItems,\n  'items_skipped (Пропущено записів)': Math.max(0, validItems - projectItems),\n  'items_failed (Помилок записів)': 0,\n  'ai_calls (AI-викликів)': intentCalls + analysisCalls,\n  'model_name (AI-модель)': 'gpt-5.4-mini',\n  'input_tokens (Вхідні токени)': inputTokens,\n  'output_tokens (Вихідні токени)': outputTokens,\n  'total_tokens (Усього токенів)': totalTokens,\n  'estimated_cost_usd (Орієнтовна вартість, USD)': estimatedCostUsd,\n  'error_message (Повідомлення про помилку)': '',\n  'run_metadata (Додаткові дані JSON)': JSON.stringify({\n    intent_calls: intentCalls, demand_analysis_calls: analysisCalls,\n    cached_input_tokens: cachedInputTokens,\n    pricing_usd_per_million: { input: INPUT_RATE_PER_MILLION, cached_input: CACHED_INPUT_RATE_PER_MILLION, output: OUTPUT_RATE_PER_MILLION },\n    method: 'OpenAI Responses API actual usage',\n  }),\n}}];"
       },
-      "id": "prepare-demand-run-summary",
       "name": "Prepare demand run summary",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
@@ -542,7 +1237,7 @@ Output:
         "documentId": {
           "__rl": true,
           "mode": "id",
-          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0",
+          "value": "[REDACTED_GOOGLE_SHEET_ID]",
           "cachedResultName": "n8n AI Opportunities Monitor (Моніторинг можливостей для n8n та AI)"
         },
         "sheetName": {
@@ -556,7 +1251,6 @@ Output:
           "value": {},
           "schema": [
             {
-              "id": "run_id (ID запуску)",
               "displayName": "run_id (ID запуску)",
               "required": true,
               "defaultMatch": true,
@@ -565,7 +1259,6 @@ Output:
               "canBeUsedToMatch": true
             },
             {
-              "id": "n8n_execution_id (ID виконання n8n)",
               "displayName": "n8n_execution_id (ID виконання n8n)",
               "required": false,
               "defaultMatch": false,
@@ -574,7 +1267,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "workflow_name (Назва workflow)",
               "displayName": "workflow_name (Назва workflow)",
               "required": false,
               "defaultMatch": false,
@@ -583,7 +1275,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "workflow_category (Категорія workflow)",
               "displayName": "workflow_category (Категорія workflow)",
               "required": false,
               "defaultMatch": false,
@@ -592,7 +1283,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "trigger_type (Тип запуску)",
               "displayName": "trigger_type (Тип запуску)",
               "required": false,
               "defaultMatch": false,
@@ -601,7 +1291,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "started_at (Час початку)",
               "displayName": "started_at (Час початку)",
               "required": false,
               "defaultMatch": false,
@@ -610,7 +1299,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "finished_at (Час завершення)",
               "displayName": "finished_at (Час завершення)",
               "required": false,
               "defaultMatch": false,
@@ -619,7 +1307,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "duration_seconds (Тривалість, сек)",
               "displayName": "duration_seconds (Тривалість, сек)",
               "required": false,
               "defaultMatch": false,
@@ -628,7 +1315,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "run_status (Статус запуску)",
               "displayName": "run_status (Статус запуску)",
               "required": false,
               "defaultMatch": false,
@@ -637,7 +1323,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "items_input (Вхідних записів)",
               "displayName": "items_input (Вхідних записів)",
               "required": false,
               "defaultMatch": false,
@@ -646,7 +1331,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "items_processed (Оброблено записів)",
               "displayName": "items_processed (Оброблено записів)",
               "required": false,
               "defaultMatch": false,
@@ -655,7 +1339,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "items_created (Створено записів)",
               "displayName": "items_created (Створено записів)",
               "required": false,
               "defaultMatch": false,
@@ -664,7 +1347,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "items_updated (Оновлено записів)",
               "displayName": "items_updated (Оновлено записів)",
               "required": false,
               "defaultMatch": false,
@@ -673,7 +1355,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "items_skipped (Пропущено записів)",
               "displayName": "items_skipped (Пропущено записів)",
               "required": false,
               "defaultMatch": false,
@@ -682,7 +1363,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "items_failed (Помилок записів)",
               "displayName": "items_failed (Помилок записів)",
               "required": false,
               "defaultMatch": false,
@@ -691,7 +1371,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "ai_calls (AI-викликів)",
               "displayName": "ai_calls (AI-викликів)",
               "required": false,
               "defaultMatch": false,
@@ -700,7 +1379,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "model_name (AI-модель)",
               "displayName": "model_name (AI-модель)",
               "required": false,
               "defaultMatch": false,
@@ -709,7 +1387,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "input_tokens (Вхідні токени)",
               "displayName": "input_tokens (Вхідні токени)",
               "required": false,
               "defaultMatch": false,
@@ -718,7 +1395,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "output_tokens (Вихідні токени)",
               "displayName": "output_tokens (Вихідні токени)",
               "required": false,
               "defaultMatch": false,
@@ -727,7 +1403,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "total_tokens (Усього токенів)",
               "displayName": "total_tokens (Усього токенів)",
               "required": false,
               "defaultMatch": false,
@@ -736,7 +1411,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "estimated_cost_usd (Орієнтовна вартість, USD)",
               "displayName": "estimated_cost_usd (Орієнтовна вартість, USD)",
               "required": false,
               "defaultMatch": false,
@@ -745,7 +1419,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "error_message (Повідомлення про помилку)",
               "displayName": "error_message (Повідомлення про помилку)",
               "required": false,
               "defaultMatch": false,
@@ -754,7 +1427,6 @@ Output:
               "canBeUsedToMatch": false
             },
             {
-              "id": "run_metadata (Додаткові дані JSON)",
               "displayName": "run_metadata (Додаткові дані JSON)",
               "required": false,
               "defaultMatch": false,
@@ -776,7 +1448,6 @@ Output:
           "useAppend": true
         }
       },
-      "id": "write-demand-automation-run",
       "name": "Write demand automation run",
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
@@ -787,16 +1458,9 @@ Output:
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 5000,
-      "credentials": {
-        "googleSheetsOAuth2Api": {
-          "id": "9jvShELJ8qb6cS8M",
-          "name": "Potik_AOS"
-        }
-      },
       "onError": "continueErrorOutput"
     }
   ],
-  "pinData": {},
   "connections": {
     "Start demand analysis": {
       "main": [
@@ -1044,38 +1708,6 @@ Output:
       ]
     }
   },
-  "active": false,
-  "settings": {
-    "executionOrder": "v1",
-    "binaryMode": "separate",
-    "availableInMCP": true
-  },
-  "versionId": "209984f3-0d19-4057-8dcb-0d9003a0093f",
-  "meta": {
-    "aiBuilderAssisted": true,
-    "builderVariant": "mcp",
-    "instanceId": "bb694af3e2398a299c822b58122146a94ee4e139b1889e45404c58650db100a0"
-  },
   "nodeGroups": [],
-  "id": "AcXgjF2Y3WVhXQuu",
-  "tags": [
-    {
-      "updatedAt": "2026-07-31T16:21:46.822Z",
-      "createdAt": "2026-07-31T16:21:46.822Z",
-      "id": "97lwq5zLTxuLWSva",
-      "name": "analytics"
-    },
-    {
-      "updatedAt": "2026-07-19T08:36:04.506Z",
-      "createdAt": "2026-07-19T08:36:04.506Z",
-      "id": "BXc7teaa7F9B6EP2",
-      "name": "status:development"
-    },
-    {
-      "updatedAt": "2026-07-09T15:01:25.899Z",
-      "createdAt": "2026-07-09T14:53:25.688Z",
-      "id": "b4V3hh8bo10FI4UQ",
-      "name": "potik-aos"
-    }
-  ]
+  "tags": []
 }

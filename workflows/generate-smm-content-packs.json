@@ -1,0 +1,624 @@
+{
+  "name": "Generate SMM content packs",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "badfc35e-93ab-4049-be89-0f1662bc87a0",
+      "name": "Start SMM Content Studio",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## SMM Content Studio\n\nРучний запуск: до 3 нових B2B-тем → LinkedIn + Instagram → Google Sheets для погодження. Автопостингу немає.",
+        "height": 200,
+        "width": 300,
+        "color": 7
+      },
+      "id": "27f51b64-7ffe-49bd-b8f6-6fe5f3395f34",
+      "name": "Sticky Note ad27f59d",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -144,
+        -272
+      ]
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "[REDACTED_GOOGLE_SHEET_ID]",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Content Opportunities (Контент-можливості)",
+          "mode": "name"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "detectAutomatically"
+            }
+          }
+        }
+      },
+      "id": "6b25f450-b607-48f6-9cf3-9145b735de93",
+      "name": "Read Content Opportunities",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        96
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "[REDACTED_GOOGLE_SHEET_ID]",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "SMM Content Queue",
+          "mode": "name"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "detectAutomatically"
+            }
+          }
+        }
+      },
+      "id": "e9f43348-1e1b-459a-8882-da97d309f6fc",
+      "name": "Read SMM Content Queue",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        448,
+        96
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "alwaysOutputData": true,
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "[REDACTED_GOOGLE_SHEET_ID]",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "SMM Brand Profile",
+          "mode": "name"
+        },
+        "options": {
+          "dataLocationOnSheet": {
+            "values": {
+              "rangeDefinition": "detectAutomatically"
+            }
+          }
+        }
+      },
+      "id": "fc5ff9ab-26b3-416f-8015-343717a12e1d",
+      "name": "Read SMM Brand Profile",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        672,
+        96
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "alwaysOutputData": true,
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "jsCode": "const all = name => { try { return $(name).all().map(item => item.json); } catch { return []; } };\nconst value = (row, key) => row[key] ?? '';\nconst idKey = 'content_opportunity_id (ID контент-можливості)';\nconst scoreKey = 'opportunity_score (Загальна оцінка можливості)';\nconst evidenceIdsKey = 'evidence_opportunity_ids (ID запитів-доказів)';\nconst evidenceUrlsKey = 'evidence_urls (Посилання на запити)';\nconst sources = all('Read Content Opportunities').filter(row => value(row, idKey) && value(row, evidenceIdsKey) && value(row, evidenceUrlsKey));\nconst used = new Set(all('Read SMM Content Queue').map(row => value(row, 'source_content_opportunity_id')).filter(Boolean));\nconst profile = all('Read SMM Brand Profile').find(row => value(row, 'status') === 'active');\nif (!profile) throw new Error('Не знайдено активний SMM Brand Profile');\nreturn sources.filter(row => !used.has(value(row, idKey))).sort((a, b) => Number(value(b, scoreKey) || 0) - Number(value(a, scoreKey) || 0)).slice(0, 3).map(row => ({ json: {\n  source_content_opportunity_id: value(row, idKey),\n  source_dedupe_key: value(row, 'dedupe_key (Ключ дедуплікації)'),\n  demand_cluster: value(row, 'demand_cluster (Кластер попиту)'),\n  client_problem: value(row, 'client_problem (Проблема клієнта)'),\n  evidence_opportunity_ids: value(row, evidenceIdsKey),\n  evidence_urls: value(row, evidenceUrlsKey),\n  technology: value(row, 'technology (Технологія)'),\n  technology_fit_rationale: value(row, 'technology_fit_rationale (Чому технологія підходить)'),\n  target_audience: value(row, 'target_audience (Цільова аудиторія)'),\n  n8n_automation_idea: value(row, 'n8n_automation_idea (Ідея n8n-автоматизації)'),\n  solution_architecture: value(row, 'solution_architecture (Архітектура рішення)'),\n  potential_service: value(row, 'potential_service (Потенційна послуга)'),\n  source_content_angle: value(row, 'content_angle (Контентний кут)'),\n  source_hook: value(row, 'hook (Хук)'),\n  opportunity_score: Number(value(row, scoreKey) || 0),\n  brand: profile,\n  batch_id: 'SMM-' + $execution.id\n}}));"
+      },
+      "id": "5cc19e87-0688-4df9-8629-fec0a79a8aac",
+      "name": "Select SMM Candidates",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "mode": "runOnceForEachItem",
+        "jsCode": "const schema = { type: 'object', additionalProperties: false, properties: {\n  topic: { type: 'string' }, content_angle: { type: 'string' }, target_audience: { type: 'string' },\n  cta_keyword: { type: 'string' }, linkedin_post: { type: 'string' }, instagram_caption: { type: 'string' },\n  visual_brief: { type: 'string' }\n}, required: ['topic', 'content_angle', 'target_audience', 'cta_keyword', 'linkedin_post', 'instagram_caption', 'visual_brief'] };\nconst brand = $json.brand;\nreturn { json: { ...$json, openai_request: {\n  model: 'gpt-5.4-mini', store: false, max_output_tokens: 2300,\n  instructions: 'Ти український B2B SMM-стратег для персонального бренду AI-автоматизатора й B2B-інтегратора. Створи один content pack для LinkedIn та Instagram лише на основі source opportunity, evidence і brand profile. Не вигадуй клієнтів, кейси, цифри, результати, сертифікації або можливості технологій. Не називай технологію, якщо її немає у source. Пиши чітко: бізнес-проблема → процес → практичне рішення → CTA. LinkedIn має бути експертним B2B-постом з короткими абзацами; Instagram — коротшим caption з тим самим змістом. CTA повинен вести в LinkedIn DM та використовувати cta_keyword з brand profile. visual_brief — текстовий бриф для каруселі або схеми, без генерації зображень. Поверни тільки JSON за schema.',\n  input: JSON.stringify({ source_opportunity: {\n    demand_cluster: $json.demand_cluster, client_problem: $json.client_problem, evidence_opportunity_ids: $json.evidence_opportunity_ids,\n    evidence_urls: $json.evidence_urls, technology: $json.technology, technology_fit_rationale: $json.technology_fit_rationale,\n    target_audience: $json.target_audience, n8n_automation_idea: $json.n8n_automation_idea, solution_architecture: $json.solution_architecture,\n    potential_service: $json.potential_service, content_angle: $json.source_content_angle, hook: $json.source_hook, opportunity_score: $json.opportunity_score\n  }, brand_profile: { positioning: brand.positioning, primary_audience: brand.primary_audience, services: brand.services, proof_points: brand.proof_points, style_rules: brand.style_rules, avoid_claims: brand.avoid_claims, cta_keyword: brand.cta_keyword, cta_template: brand.cta_template, language: brand.language } }),\n  text: { format: { type: 'json_schema', name: 'smm_content_pack', strict: true, schema } }\n}}};"
+      },
+      "id": "e9f6504a-eda8-4b8e-a395-4ab10f1bafc1",
+      "name": "Prepare SMM Request",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1120,
+        96
+      ]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.openai.com/v1/responses",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpBearerAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.openai_request) }}",
+        "options": {}
+      },
+      "id": "671de800-fda3-4111-89df-0c29c2181950",
+      "name": "Generate SMM Content",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1344,
+        96
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "jsCode": "const responses = $input.all();\nconst requests = $('Prepare SMM Request').all();\nreturn responses.map((response, index) => {\n  const base = requests[index]?.json;\n  if (!base) throw new Error('Не знайдено source opportunity для SMM-відповіді');\n  const text = response.json.output?.[0]?.content?.find(part => part.type === 'output_text')?.text;\n  if (!text) throw new Error('OpenAI не повернув текст SMM-пакета');\n  const idea = JSON.parse(text);\n  const now = $now.toISO();\n  return { json: {\n    smm_content_pack_id: 'SMM::' + base.source_content_opportunity_id,\n    source_content_opportunity_id: base.source_content_opportunity_id,\n    source_dedupe_key: base.source_dedupe_key,\n    batch_id: base.batch_id,\n    topic: idea.topic,\n    content_angle: idea.content_angle,\n    target_audience: idea.target_audience,\n    cta_keyword: idea.cta_keyword,\n    linkedin_post: idea.linkedin_post,\n    instagram_caption: idea.instagram_caption,\n    visual_brief: idea.visual_brief,\n    review_status: 'needs_review',\n    reviewer_note: '',\n    ai_model: response.json.model || 'gpt-5.4-mini',\n    generated_at: now,\n    updated_at: now,\n    approved_at: '',\n    published_at: '',\n    published_url: ''\n  }};\n});"
+      },
+      "id": "86c89afb-dd88-49eb-a57d-e875f687699b",
+      "name": "Shape SMM Queue Rows",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        0
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "[REDACTED_GOOGLE_SHEET_ID]",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "SMM Content Queue",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "smm_content_pack_id"
+          ],
+          "schema": [
+            {
+              "id": "smm_content_pack_id",
+              "displayName": "smm_content_pack_id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "source_content_opportunity_id",
+              "displayName": "source_content_opportunity_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "source_dedupe_key",
+              "displayName": "source_dedupe_key",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "batch_id",
+              "displayName": "batch_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "topic",
+              "displayName": "topic",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "content_angle",
+              "displayName": "content_angle",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "target_audience",
+              "displayName": "target_audience",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cta_keyword",
+              "displayName": "cta_keyword",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "linkedin_post",
+              "displayName": "linkedin_post",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "instagram_caption",
+              "displayName": "instagram_caption",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "visual_brief",
+              "displayName": "visual_brief",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "review_status",
+              "displayName": "review_status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "reviewer_note",
+              "displayName": "reviewer_note",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "ai_model",
+              "displayName": "ai_model",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "generated_at",
+              "displayName": "generated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "approved_at",
+              "displayName": "approved_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "published_at",
+              "displayName": "published_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "published_url",
+              "displayName": "published_url",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "handlingExtraData": "ignoreIt"
+        }
+      },
+      "id": "69902d58-b5f8-4e8d-9975-8415903583bb",
+      "name": "Upsert SMM Content Queue",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1792,
+        0
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "jsCode": "const responses = $('Generate SMM Content').all();\nconst usage = responses.reduce((total, item) => {\n  const u = item.json.usage ?? {};\n  total.input += Number(u.input_tokens ?? 0);\n  total.cached += Number(u.input_tokens_details?.cached_tokens ?? 0);\n  total.output += Number(u.output_tokens ?? 0);\n  total.calls += 1;\n  return total;\n}, { input: 0, cached: 0, output: 0, calls: 0 });\nconst totalTokens = usage.input + usage.output;\nconst estimatedCostUsd = Number(((Math.max(0, usage.input - usage.cached) / 1000000) * 0.75 + (usage.cached / 1000000) * 0.075 + (usage.output / 1000000) * 4.5).toFixed(8));\nconst now = $now.toISO();\nreturn [{ json: {\n  'run_id (ID запуску)': 'SMM-' + $execution.id,\n  'n8n_execution_id (ID виконання n8n)': String($execution.id),\n  'workflow_name (Назва workflow)': $workflow.name,\n  'workflow_category (Категорія workflow)': 'smm_content',\n  'trigger_type (Тип запуску)': $execution.mode,\n  'started_at (Час початку)': now,\n  'finished_at (Час завершення)': now,\n  'duration_seconds (Тривалість, сек)': 0,\n  'run_status (Статус запуску)': 'success',\n  'items_input (Вхідних записів)': responses.length,\n  'items_processed (Оброблено записів)': responses.length,\n  'items_created (Створено записів)': responses.length,\n  'items_updated (Оновлено записів)': 0,\n  'items_skipped (Пропущено записів)': 0,\n  'items_failed (Помилок записів)': 0,\n  'ai_calls (AI-викликів)': usage.calls,\n  'model_name (AI-модель)': responses[0]?.json.model ?? 'gpt-5.4-mini',\n  'input_tokens (Вхідні токени)': usage.input,\n  'output_tokens (Вихідні токени)': usage.output,\n  'total_tokens (Усього токенів)': totalTokens,\n  'estimated_cost_usd (Орієнтовна вартість, USD)': estimatedCostUsd,\n  'error_message (Повідомлення про помилку)': '',\n  'run_metadata (Додаткові дані JSON)': JSON.stringify({ cached_input_tokens: usage.cached, pricing_usd_per_million: { input: 0.75, cached_input: 0.075, output: 4.5 }, method: 'OpenAI Responses API actual usage' })\n}}];"
+      },
+      "id": "dfac5e62-7f9d-4918-8b6b-3155f32ea683",
+      "name": "Prepare SMM Run Metrics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1568,
+        192
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "[REDACTED_GOOGLE_SHEET_ID]",
+          "mode": "id"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "Automation_Runs (Запуски автоматизацій)",
+          "mode": "name"
+        },
+        "columns": {
+          "mappingMode": "autoMapInputData",
+          "value": {},
+          "matchingColumns": [
+            "run_id (ID запуску)"
+          ],
+          "schema": [
+            {
+              "id": "run_id (ID запуску)",
+              "displayName": "run_id (ID запуску)",
+              "required": true,
+              "defaultMatch": true,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "locationDefine": {
+            "values": {}
+          },
+          "handlingExtraData": "ignoreIt",
+          "useAppend": true
+        }
+      },
+      "id": "1dba1987-1a60-4b2f-ae7f-5693451311cc",
+      "name": "Write SMM Automation Run",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        1792,
+        192
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    },
+    {
+      "parameters": {
+        "content": "## Контентні обмеження\\n\\nЛише підтверджені поля source opportunity + active SMM Brand Profile. Заборонено вигадувати клієнтів, кейси, цифри, результати чи технології. LinkedIn CTA: DM із ключовим словом **«автоматизація»**.",
+        "height": 180,
+        "width": 720,
+        "color": 5
+      },
+      "id": "c03f2787-eff3-4af7-b9da-710de4bbe2dd",
+      "name": "Content policy",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        272,
+        -272
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Ручний review\\n\\nКожен новий пак записується як `needs_review`. Редагування, approved і published виконуються у Google Sheets; автопостингу немає.",
+        "height": 150,
+        "width": 420,
+        "color": 4
+      },
+      "id": "51c72409-bdf5-415e-8966-8e60b2edad71",
+      "name": "Review queue",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        -256
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Start SMM Content Studio": {
+      "main": [
+        [
+          {
+            "node": "Read Content Opportunities",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Content Opportunities": {
+      "main": [
+        [
+          {
+            "node": "Read SMM Content Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read SMM Content Queue": {
+      "main": [
+        [
+          {
+            "node": "Read SMM Brand Profile",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read SMM Brand Profile": {
+      "main": [
+        [
+          {
+            "node": "Select SMM Candidates",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select SMM Candidates": {
+      "main": [
+        [
+          {
+            "node": "Prepare SMM Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare SMM Request": {
+      "main": [
+        [
+          {
+            "node": "Generate SMM Content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate SMM Content": {
+      "main": [
+        [
+          {
+            "node": "Shape SMM Queue Rows",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prepare SMM Run Metrics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Shape SMM Queue Rows": {
+      "main": [
+        [
+          {
+            "node": "Upsert SMM Content Queue",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare SMM Run Metrics": {
+      "main": [
+        [
+          {
+            "node": "Write SMM Automation Run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "availableInMCP": true,
+    "errorWorkflow": "[REDACTED_ERROR_WORKFLOW_ID]",
+    "binaryMode": "separate"
+  },
+  "versionId": "84fd8d86-fb63-4071-850b-8f5b9532e9b9",
+  "meta": {
+    "aiBuilderAssisted": true,
+    "builderVariant": "mcp"
+  },
+  "nodeGroups": [],
+  "id": "[REDACTED_WORKFLOW_ID]",
+  "tags": []
+}

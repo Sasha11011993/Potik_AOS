@@ -48,8 +48,7 @@
       ],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 5000,
-      "onError": "continueErrorOutput"
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -613,7 +612,6 @@
       "retryOnFail": true,
       "maxTries": 3,
       "waitBetweenTries": 5000,
-      "onError": "continueErrorOutput",
       "notes": "Upserts one analyzed opportunity per row using opportunity_id as the stable key. The branch originates before grouping because Demand Analysis stores individual records."
     },
     {
@@ -828,8 +826,7 @@
       ],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 5000,
-      "onError": "continueErrorOutput"
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -908,46 +905,6 @@
     },
     {
       "parameters": {
-        "assignments": {
-          "assignments": [
-            {
-              "name": "error_stage",
-              "value": "={{ $json.error?.node?.name || $json.node?.name || 'unknown_node' }}",
-              "type": "string"
-            },
-            {
-              "name": "error_message",
-              "value": "={{ $json.error?.message || $json.message || 'Unknown execution error' }}",
-              "type": "string"
-            },
-            {
-              "name": "error_time",
-              "value": "={{ DateTime.now().toISO() }}",
-              "type": "string"
-            },
-            {
-              "name": "next_action",
-              "value": "Review the failed node, credentials, API quota, or spreadsheet access, then run the workflow again.",
-              "type": "string"
-            }
-          ]
-        },
-        "includeOtherFields": true,
-        "options": {
-          "dotNotation": false
-        }
-      },
-      "name": "Capture analysis error",
-      "type": "n8n-nodes-base.set",
-      "typeVersion": 3.4,
-      "position": [
-        4032,
-        80
-      ],
-      "notes": "Receives Google Sheets error outputs after retries are exhausted. It preserves the original error payload so the failed step is visible in the execution."
-    },
-    {
-      "parameters": {
         "method": "POST",
         "url": "https://api.openai.com/v1/responses",
         "authentication": "genericCredentialType",
@@ -985,7 +942,10 @@
       "position": [
         672,
         144
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -1121,7 +1081,10 @@
       "position": [
         1792,
         144
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -1457,8 +1420,7 @@
       ],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 5000,
-      "onError": "continueErrorOutput"
+      "waitBetweenTries": 5000
     }
   ],
   "connections": {
@@ -1483,13 +1445,6 @@
         [
           {
             "node": "Filter valid opportunities",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Capture analysis error",
             "type": "main",
             "index": 0
           }
@@ -1590,14 +1545,7 @@
     },
     "Upsert demand analysis rows": {
       "main": [
-        null,
-        [
-          {
-            "node": "Capture analysis error",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     },
     "Upsert demand report rows": {
@@ -1605,13 +1553,6 @@
         [
           {
             "node": "Prepare demand run summary",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Capture analysis error",
             "type": "main",
             "index": 0
           }
@@ -1697,14 +1638,7 @@
     },
     "Write demand automation run": {
       "main": [
-        null,
-        [
-          {
-            "node": "Capture analysis error",
-            "type": "main",
-            "index": 0
-          }
-        ]
+        []
       ]
     }
   },

@@ -80,6 +80,12 @@ source_id:external_id
 
 Експорт навмисно не містить токенів, API-ключів або OAuth-даних.
 
+## Переносима конфігурація після імпорту
+
+У вузлі `Зберегти можливості в Google Sheets` виберіть свій документ замість `[REDACTED_GOOGLE_SHEET_ID]` і підтвердьте аркуш `Opportunities (Можливості)`. Для API-вузлів створіть або прив’яжіть `httpHeaderAuth` для Freelancer.com та `httpBearerAuth` для Freelancehunt; Google Sheets використовуйте лише через OAuth2 credential.
+
+Усі RSS, HTTP та Google Sheets-вузли мають три спроби з паузою 5 секунд. Після імпорту призначте спільний `Handle Potik AOS workflow failure` як Error Workflow у Settings.
+
 ## Credentials і безпека
 
 - Google Sheets OAuth2: `Potik_AOS`

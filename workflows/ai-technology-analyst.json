@@ -17,7 +17,7 @@
         "documentId": {
           "__rl": true,
           "mode": "id",
-          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0",
+          "value": "[REDACTED_GOOGLE_SHEET_ID]",
           "cachedResultName": "n8n AI Opportunities Monitor (Моніторинг можливостей для n8n та AI)"
         },
         "sheetName": {
@@ -53,7 +53,10 @@
           "id": "9jvShELJ8qb6cS8M",
           "name": "Potik_AOS"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -78,7 +81,6 @@
           "combinator": "and"
         },
         "options": {
-
           "ignoreCase": true
         }
       },
@@ -159,7 +161,6 @@
               "name": "vendor (Постачальник)",
               "value": "={{ $json.output.vendor }}",
               "type": "string"
-
             },
             {
               "id": "6",
@@ -240,7 +241,6 @@
               "type": "string"
             },
             {
-
               "id": "19",
               "name": "evidence_urls (Посилання на джерела)",
               "value": "={{ $('Keep New News').item.json[\"url (Посилання)\"] }}",
@@ -291,7 +291,7 @@
         "documentId": {
           "__rl": true,
           "mode": "id",
-          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0",
+          "value": "[REDACTED_GOOGLE_SHEET_ID]",
           "cachedResultName": "n8n AI Opportunities Monitor (Моніторинг можливостей для n8n та AI)"
         },
         "sheetName": {
@@ -321,7 +321,6 @@
               "display": true,
               "type": "string",
               "canBeUsedToMatch": false
-
             },
             {
               "id": "source_news_ids (ID вихідних новин)",
@@ -402,7 +401,6 @@
               "defaultMatch": false,
               "display": true,
               "type": "string",
-
               "canBeUsedToMatch": false
             },
             {
@@ -483,7 +481,6 @@
               "required": false,
               "defaultMatch": false,
               "display": true,
-
               "type": "string",
               "canBeUsedToMatch": false
             },
@@ -541,7 +538,10 @@
           "id": "9jvShELJ8qb6cS8M",
           "name": "Potik_AOS"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -564,7 +564,6 @@
               "name": "updated_at",
               "value": "={{ $now.toISO() }}",
               "type": "string"
-
             }
           ]
         },
@@ -587,7 +586,7 @@
         "documentId": {
           "__rl": true,
           "mode": "id",
-          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0",
+          "value": "[REDACTED_GOOGLE_SHEET_ID]",
           "cachedResultName": "n8n AI Opportunities Monitor (Моніторинг можливостей для n8n та AI)"
         },
         "sheetName": {
@@ -645,7 +644,6 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-
         3584,
         32
       ],
@@ -654,7 +652,10 @@
           "id": "9jvShELJ8qb6cS8M",
           "name": "Potik_AOS"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -699,7 +700,7 @@
         "documentId": {
           "__rl": true,
           "mode": "id",
-          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0",
+          "value": "[REDACTED_GOOGLE_SHEET_ID]",
           "cachedResultName": "n8n AI Opportunities Monitor (Моніторинг можливостей для n8n та AI)"
         },
         "sheetName": {
@@ -726,7 +727,6 @@
             },
             {
               "id": "review_status (Статус перевірки)",
-
               "displayName": "review_status (Статус перевірки)",
               "required": false,
               "defaultMatch": false,
@@ -766,14 +766,17 @@
           "id": "9jvShELJ8qb6cS8M",
           "name": "Potik_AOS"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
         "documentId": {
           "__rl": true,
           "mode": "id",
-          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0",
+          "value": "[REDACTED_GOOGLE_SHEET_ID]",
           "cachedResultName": "n8n AI Opportunities Monitor (Моніторинг можливостей для n8n та AI)"
         },
         "sheetName": {
@@ -807,7 +810,6 @@
       "id": "8de6b2d9-8a4a-4930-8b13-bd015aa13d9a",
       "name": "Find Existing Tech Signal",
       "type": "n8n-nodes-base.googleSheets",
-
       "typeVersion": 4.7,
       "position": [
         2688,
@@ -819,7 +821,10 @@
           "id": "9jvShELJ8qb6cS8M",
           "name": "Potik_AOS"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -888,7 +893,6 @@
             {
               "id": "1",
               "name": "news_id (ID новини)",
-
               "value": "={{ $json[\"news_id (ID новини)\"] }}",
               "type": "string"
             },
@@ -925,7 +929,7 @@
         "documentId": {
           "__rl": true,
           "mode": "id",
-          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0"
+          "value": "[REDACTED_GOOGLE_SHEET_ID]"
         },
         "sheetName": {
           "__rl": true,
@@ -969,7 +973,6 @@
             }
           ]
         },
-
         "options": {
           "cellFormat": "USER_ENTERED",
           "locationDefine": {
@@ -991,7 +994,10 @@
           "id": "9jvShELJ8qb6cS8M",
           "name": "Potik_AOS"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -1050,7 +1056,6 @@
               "name": "items_processed",
               "value": 0,
               "type": "number"
-
             },
             {
               "id": "10",
@@ -1131,7 +1136,6 @@
       "position": [
         672,
         0
-
       ]
     },
     {
@@ -1156,9 +1160,10 @@
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
       "position": [
-        3808,
+        3824,
         224
-      ]
+      ],
+      "executeOnce": true
     },
     {
       "parameters": {
@@ -1171,20 +1176,6 @@
       "position": [
         2912,
         320
-      ],
-      "onError": "continueErrorOutput"
-    },
-    {
-      "parameters": {
-        "jsCode": "const run = $('Prepare Analyst Run Start').first().json;\nconst source = $input.first().json;\nconst message = source.error?.message ?? source.message ?? 'Unhandled workflow error';\nconst finishedAt = $now.toISO();\nconst durationSeconds = Math.max(\n  0,\n  Math.round($now.diff(DateTime.fromISO(run.started_at), 'seconds').seconds),\n);\n\nreturn [{\n  json: {\n    ...run,\n    finished_at: finishedAt,\n    duration_seconds: durationSeconds,\n    run_status: 'failed',\n    items_failed: 1,\n    error_message: message,\n    run_metadata: JSON.stringify({\n      filter_threshold: 5,\n      batch_limit: 10,\n      failed_node: 'Merge Signal Sources Safely',\n      error: message,\n    }),\n  },\n}];"
-      },
-      "id": "2b0fd211-274b-4389-8bce-4dd910c25ac2",
-      "name": "Prepare Analyst Run Failure",
-      "type": "n8n-nodes-base.code",
-      "typeVersion": 2,
-      "position": [
-        3808,
-        480
       ]
     },
     {
@@ -1212,7 +1203,6 @@
               "batchInterval": 400
             }
           },
-
           "response": {
             "response": {
               "responseFormat": "json"
@@ -1231,7 +1221,7 @@
       ],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 3000,
+      "waitBetweenTries": 5000,
       "credentials": {
         "httpHeaderAuth": {
           "id": "aCOn36vzIzYR3Ql6",
@@ -1293,7 +1283,6 @@
               "id": "a8",
               "name": "news_categories",
               "type": "string",
-
               "value": "={{ $(\"Keep New News\").item.json[\"categories (Категорії)\"] ?? \"\" }}"
             },
             {
@@ -1371,10 +1360,9 @@
       ],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 3000,
+      "waitBetweenTries": 5000,
       "credentials": {
         "httpBearerAuth": {
-
           "id": "Cg9ZPI0VEC5qogO8",
           "name": "Potik_AOS-OpenAI-Bearer"
         }
@@ -1455,7 +1443,6 @@
             {
               "id": "3",
               "name": "workflow_name (Назва workflow)",
-
               "value": "={{ $json.workflow_name ?? 'Unknown workflow' }}",
               "type": "string"
             },
@@ -1536,7 +1523,6 @@
               "name": "ai_calls (AI-викликів)",
               "value": "={{ Number($json.ai_calls ?? 0) }}",
               "type": "number"
-
             },
             {
               "id": "17",
@@ -1601,7 +1587,7 @@
         "documentId": {
           "__rl": true,
           "mode": "id",
-          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0"
+          "value": "[REDACTED_GOOGLE_SHEET_ID]"
         },
         "sheetName": {
           "__rl": true,
@@ -1617,7 +1603,6 @@
               "id": "run_id (ID запуску)",
               "displayName": "run_id (ID запуску)",
               "required": true,
-
               "defaultMatch": true,
               "display": true,
               "type": "string",
@@ -1698,7 +1683,6 @@
             {
               "id": "items_input (Вхідних записів)",
               "displayName": "items_input (Вхідних записів)",
-
               "required": false,
               "defaultMatch": false,
               "display": true,
@@ -1779,7 +1763,6 @@
             },
             {
               "id": "output_tokens (Вихідні токени)",
-
               "displayName": "output_tokens (Вихідні токени)",
               "required": false,
               "defaultMatch": false,
@@ -1850,7 +1833,10 @@
           "id": "9jvShELJ8qb6cS8M",
           "name": "Potik_AOS"
         }
-      }
+      },
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -1860,7 +1846,6 @@
         "color": 5
       },
       "id": "9ca64256-44e7-498b-a839-8c56e4c16df3",
-
       "name": "Workflow Overview",
       "type": "n8n-nodes-base.stickyNote",
       "typeVersion": 1,
@@ -1868,6 +1853,20 @@
         -400,
         -480
       ]
+    },
+    {
+      "parameters": {
+        "mode": "append",
+        "numberInputs": 4
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3584,
+        224
+      ],
+      "id": "0e770200-70dc-4f29-8cf8-a05c80e05f18",
+      "name": "Await all terminal paths"
     }
   ],
   "pinData": {},
@@ -1941,7 +1940,6 @@
     },
     "Prepare Analyzed Update": {
       "main": [
-
         [
           {
             "node": "Mark News Analyzed",
@@ -1984,9 +1982,9 @@
         ],
         [
           {
-            "node": "Prepare Analyst Run Final",
+            "node": "Await all terminal paths",
             "type": "main",
-            "index": 0
+            "index": 3
           }
         ]
       ]
@@ -2022,7 +2020,6 @@
     },
     "Prepare Keyword Filtered Update": {
       "main": [
-
         [
           {
             "node": "Mark News Keyword Filtered",
@@ -2047,9 +2044,9 @@
       "main": [
         [
           {
-            "node": "Prepare Analyst Run Final",
+            "node": "Await all terminal paths",
             "type": "main",
-            "index": 0
+            "index": 2
           }
         ]
       ]
@@ -2069,7 +2066,7 @@
       "main": [
         [
           {
-            "node": "Prepare Analyst Run Final",
+            "node": "Await all terminal paths",
             "type": "main",
             "index": 0
           }
@@ -2080,9 +2077,9 @@
       "main": [
         [
           {
-            "node": "Prepare Analyst Run Final",
+            "node": "Await all terminal paths",
             "type": "main",
-            "index": 0
+            "index": 1
           }
         ]
       ]
@@ -2092,25 +2089,6 @@
         [
           {
             "node": "Write Tech Signal",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Prepare Analyst Run Failure",
-            "type": "main",
-            "index": 0
-          }
-        ]
-
-      ]
-    },
-    "Prepare Analyst Run Failure": {
-      "main": [
-        [
-          {
-            "node": "Normalize Run Metrics for Sheet",
             "type": "main",
             "index": 0
           }
@@ -2182,9 +2160,19 @@
           }
         ]
       ]
+    },
+    "Await all terminal paths": {
+      "main": [
+        [
+          {
+            "node": "Prepare Analyst Run Final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
-
   "active": false,
   "settings": {
     "executionOrder": "v1",

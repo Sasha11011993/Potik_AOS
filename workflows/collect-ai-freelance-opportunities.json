@@ -241,7 +241,7 @@
       ],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 2000,
+      "waitBetweenTries": 5000,
       "notes": "Шукає активні проєкти через офіційний Freelancer API. Авторизація зберігається лише в credential."
     },
     {
@@ -452,7 +452,7 @@
       ],
       "retryOnFail": true,
       "maxTries": 3,
-      "waitBetweenTries": 2000,
+      "waitBetweenTries": 5000,
       "notes": "Отримує відкриті проєкти через офіційний Freelancehunt API 2.0. Мову відповіді встановлено українську.",
       "disabled": false
     },
@@ -637,7 +637,10 @@
         576
       ],
       "notes": "Публічний RSS Djinni. Використовується замість неофіційного API або web-скрапінгу; не потребує авторизації.",
-      "disabled": false
+      "disabled": false,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -809,7 +812,7 @@
         "documentId": {
           "__rl": true,
           "mode": "id",
-          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0",
+          "value": "[REDACTED_GOOGLE_SHEET_ID]",
           "cachedResultName": "n8n AI Opportunities Monitor (Моніторинг можливостей для n8n та AI)"
         },
         "sheetName": {
@@ -1067,7 +1070,10 @@
         288
       ],
       "notes": "Upsert у аркуш Opportunities (Можливості): external_id є ключем, тому нові записи додаються, а наявні оновлюються без повторних рядків.",
-      "disabled": false
+      "disabled": false,
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {

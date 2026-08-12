@@ -1,0 +1,206 @@
+{
+  "name": "Handle Potik AOS workflow failure",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.errorTrigger",
+      "typeVersion": 1,
+      "position": [0, 300],
+      "id": "b7b953b9-4a58-4a89-914f-899417dc3f61",
+      "name": "Receive workflow failure"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "run_id",
+              "value": "={{ 'ERR-' + ($json.workflow?.id ?? 'unknown') + '-' + ($json.execution?.id ?? $execution.id) }}",
+              "type": "string"
+            },
+            {
+              "id": "2",
+              "name": "execution_id",
+              "value": "={{ String($json.execution?.id ?? '') }}",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "workflow_name",
+              "value": "={{ $json.workflow?.name ?? 'Unknown workflow' }}",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "trigger_type",
+              "value": "={{ $json.execution?.mode ?? 'production' }}",
+              "type": "string"
+            },
+            {
+              "id": "5",
+              "name": "failure_time",
+              "value": "={{ $json.execution?.error?.timestamp ? DateTime.fromMillis($json.execution.error.timestamp).toISO() : $now.toISO() }}",
+              "type": "string"
+            },
+            {
+              "id": "6",
+              "name": "failed_node",
+              "value": "={{ $json.execution?.lastNodeExecuted ?? 'Unknown node' }}",
+              "type": "string"
+            },
+            {
+              "id": "7",
+              "name": "error_message",
+              "value": "={{ $json.execution?.error?.message ?? 'Unhandled workflow error' }}",
+              "type": "string"
+            },
+            {
+              "id": "8",
+              "name": "execution_url",
+              "value": "={{ $json.execution?.url ?? '' }}",
+              "type": "string"
+            },
+            {
+              "id": "9",
+              "name": "run_metadata",
+              "value": "={{ JSON.stringify({ workflow_id: $json.workflow?.id ?? '', failed_node: $json.execution?.lastNodeExecuted ?? '', error_description: $json.execution?.error?.description ?? '', execution_url: $json.execution?.url ?? '' }) }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {
+          "dotNotation": false
+        }
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [272, 300],
+      "id": "4e2d9eb6-2b0c-447d-b0e6-2c279852a183",
+      "name": "Normalize failure record"
+    },
+    {
+      "parameters": {
+        "resource": "sheet",
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "mode": "id",
+          "value": "[REDACTED_GOOGLE_SHEET_ID]",
+          "cachedResultName": "Configure after import"
+        },
+        "sheetName": {
+          "__rl": true,
+          "mode": "name",
+          "value": "Automation_Runs (Запуски автоматизацій)"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "run_id (ID запуску)": "={{ $('Normalize failure record').item.json.run_id }}",
+            "n8n_execution_id (ID виконання n8n)": "={{ $('Normalize failure record').item.json.execution_id }}",
+            "workflow_name (Назва workflow)": "={{ $('Normalize failure record').item.json.workflow_name }}",
+            "workflow_category (Категорія workflow)": "error_handler",
+            "trigger_type (Тип запуску)": "={{ $('Normalize failure record').item.json.trigger_type }}",
+            "started_at (Час початку)": "={{ $('Normalize failure record').item.json.failure_time }}",
+            "finished_at (Час завершення)": "={{ $('Normalize failure record').item.json.failure_time }}",
+            "run_status (Статус запуску)": "failed",
+            "items_failed (Помилок записів)": 1,
+            "error_message (Повідомлення про помилку)": "={{ $('Normalize failure record').item.json.error_message }}",
+            "run_metadata (Додаткові дані JSON)": "={{ $('Normalize failure record').item.json.run_metadata }}"
+          },
+          "matchingColumns": [
+            "run_id (ID запуску)"
+          ]
+        },
+        "options": {
+          "cellFormat": "USER_ENTERED",
+          "handlingExtraData": "ignoreIt",
+          "useAppend": true
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [560, 300],
+      "id": "e723a71f-ce3c-44b0-b4e1-4505519b8e98",
+      "name": "Record failed run in Automation_Runs",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "operation": "sendMessage",
+        "chatId": "[REDACTED_TELEGRAM_CHAT_ID]",
+        "text": "={{ '🚨 <b>Potik AOS workflow failure</b>\\nWorkflow: ' + $('Normalize failure record').item.json.workflow_name + '\\nNode: ' + $('Normalize failure record').item.json.failed_node + '\\nError: ' + $('Normalize failure record').item.json.error_message + '\\nExecution: ' + $('Normalize failure record').item.json.execution_url + '\\nTime: ' + $('Normalize failure record').item.json.failure_time }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML",
+          "disable_web_page_preview": true
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [864, 300],
+      "id": "a4a168c3-fac2-4861-89be-1b93d754904b",
+      "name": "Send Telegram failure alert",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
+    }
+  ],
+  "connections": {
+    "Receive workflow failure": {
+      "main": [
+        [
+          {
+            "node": "Normalize failure record",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize failure record": {
+      "main": [
+        [
+          {
+            "node": "Record failed run in Automation_Runs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Record failed run in Automation_Runs": {
+      "main": [
+        [
+          {
+            "node": "Send Telegram failure alert",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Telegram failure alert",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "templateCredsSetupCompleted": false
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e4fd6a9c-1dc3-45cc-a213-adcf327cbca1",
+  "tags": []
+}

@@ -491,7 +491,10 @@
       "position": [
         944,
         304
-      ]
+      ],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -637,7 +640,10 @@
         944,
         496
       ],
-      "notes": "Офіційна RSS-стрічка OpenAI News. Фільтр нижче залишить Codex, agentic coding і developer-релевантні матеріали."
+      "notes": "Офіційна RSS-стрічка OpenAI News. Фільтр нижче залишить Codex, agentic coding і developer-релевантні матеріали.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -786,7 +792,10 @@
         496,
         688
       ],
-      "notes": "Офіційний newsroom Anthropic. RSS недоступний, тому отримуємо HTML-сторінку для подальшого структурованого вилучення."
+      "notes": "Офіційний newsroom Anthropic. RSS недоступний, тому отримуємо HTML-сторінку для подальшого структурованого вилучення.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -998,7 +1007,10 @@
         944,
         880
       ],
-      "notes": "Офіційний RSS Model Context Protocol Blog: специфікації, MCP Apps, сервери, клієнти й агентні інтеграції."
+      "notes": "Офіційний RSS Model Context Protocol Blog: специфікації, MCP Apps, сервери, клієнти й агентні інтеграції.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -1144,7 +1156,10 @@
         944,
         1072
       ],
-      "notes": "Офіційний RSS LangChain Blog: LangChain, LangGraph, агентна оркестрація, RAG та production-практики."
+      "notes": "Офіційний RSS LangChain Blog: LangChain, LangGraph, агентна оркестрація, RAG та production-практики.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -1290,7 +1305,10 @@
         944,
         1264
       ],
-      "notes": "Офіційна RSS/Atom-стрічка Google Developers Blog."
+      "notes": "Офіційна RSS/Atom-стрічка Google Developers Blog.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -1436,7 +1454,10 @@
         944,
         1456
       ],
-      "notes": "Офіційна RSS/Atom-стрічка GitHub Blog — AI & ML."
+      "notes": "Офіційна RSS/Atom-стрічка GitHub Blog — AI & ML.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -1582,7 +1603,10 @@
         944,
         1648
       ],
-      "notes": "Офіційна RSS/Atom-стрічка Vercel Blog / v0."
+      "notes": "Офіційна RSS/Atom-стрічка Vercel Blog / v0.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -1728,7 +1752,10 @@
         944,
         2032
       ],
-      "notes": "Офіційна RSS/Atom-стрічка Zapier Blog."
+      "notes": "Офіційна RSS/Atom-стрічка Zapier Blog.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -1890,7 +1917,10 @@
         496,
         1840
       ],
-      "notes": "Офіційна сторінка Cursor Blog. RSS відсутній, тому отримуємо HTML із нейтральним User-Agent."
+      "notes": "Офіційна сторінка Cursor Blog. RSS відсутній, тому отримуємо HTML із нейтральним User-Agent.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     },
     {
       "parameters": {
@@ -2129,7 +2159,7 @@
         "documentId": {
           "__rl": true,
           "mode": "id",
-          "value": "1rNJ3PVZp78kM-9XOIFJBP7t54mWdGVEzkHzV2QUDAO0",
+          "value": "[REDACTED_GOOGLE_SHEET_ID]",
           "cachedResultName": "n8n AI Opportunities Monitor (Моніторинг можливостей для n8n та AI)"
         },
         "sheetName": {
@@ -2311,7 +2341,10 @@
         2064,
         1168
       ],
-      "notes": "Upsert у аркуш News (Новини) за dedupe_key: нові новини додаються, а записи з таким самим ключем оновлюються без створення дублів."
+      "notes": "Upsert у аркуш News (Новини) за dedupe_key: нові новини додаються, а записи з таким самим ключем оновлюються без створення дублів.",
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 5000
     }
   ],
   "nodeGroups": [],
@@ -2344,4 +2377,3 @@
   ],
   "canExecute": true
 }
-

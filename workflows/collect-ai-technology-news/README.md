@@ -70,6 +70,12 @@ Workflow має ручний запуск і залишається неакти
 
 Для запису використовується Google Sheets OAuth2 credential `Potik_AOS`; секрети не входять до export-файлу. Масив `categories` перетворюється на текст. `description` і `search_text` обмежуються 45 000 символів, щоб не перевищувати ліміт Google Sheets у 50 000 символів на клітинку.
 
+## Переносима конфігурація після імпорту
+
+У вузлі `Зберегти новини в Google Sheets` виберіть свій документ замість `[REDACTED_GOOGLE_SHEET_ID]` і підтвердьте аркуш `News (Новини)`. Google Sheets підключайте через OAuth2 credential; не додавайте ID, токени або OAuth-дані до JSON-export.
+
+Усі RSS, HTTP та Google Sheets-вузли мають три спроби з паузою 5 секунд. Після імпорту призначте спільний `Handle Potik AOS workflow failure` як Error Workflow у Settings.
+
 ## Інструкція оператора
 
 1. Відкрийте workflow у n8n і натисніть **Execute Workflow**.

@@ -17,6 +17,7 @@
 - [AI-новини](workflows/collect-ai-technology-news.json)
 - [AI Demand Analyst](workflows/analyze-ai-demand.json)
 - [AI Technology Analyst](workflows/ai-technology-analyst.json)
+- [AI Opportunity Strategist — Content Ideas](workflows/ai-opportunity-strategist.json) — [README](workflows/ai-opportunity-strategist/README.md)
 - [Обробник помилок workflow](workflows/workflow-error-handler.json)
 
 Документація обробника помилок: [README](workflows/workflow-error-handler/README.md).

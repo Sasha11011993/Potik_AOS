@@ -1,0 +1,786 @@
+{
+  "schema_version": 1,
+  "export_type": "sanitized_workflow_documentation",
+  "importable": false,
+  "redaction_notice": "Documentation-only export. Prompts, source code, expressions, credentials, IDs, sheet names, folder IDs and field mappings are intentionally removed.",
+  "name": "AI Demand-to-Content Generator",
+  "active": false,
+  "tags": [],
+  "nodes": [
+    {
+      "name": "Start content generation",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        112
+      ],
+      "configuration": {
+        "parameters": "redacted where applicable"
+      }
+    },
+    {
+      "name": "Read Demand to Content",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        224,
+        208
+      ],
+      "configuration": {
+        "service": "Google Sheets",
+        "operation": "read_or_write",
+        "document": "redacted",
+        "sheet": "redacted",
+        "field_mappings": "redacted"
+      }
+    },
+    {
+      "name": "Prepare content run start",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        224,
+        16
+      ],
+      "configuration": {
+        "parameters": "redacted where applicable"
+      }
+    },
+    {
+      "name": "Select up to three selected topics",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        448,
+        128
+      ],
+      "configuration": {
+        "runtime": "JavaScript Code node",
+        "source_code": "redacted"
+      }
+    },
+    {
+      "name": "Capture run-level error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4704,
+        608
+      ],
+      "configuration": {
+        "runtime": "JavaScript Code node",
+        "source_code": "redacted"
+      }
+    },
+    {
+      "name": "Has selected topics",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        672,
+        128
+      ],
+      "configuration": {
+        "branching_logic": "redacted status/data condition"
+      }
+    },
+    {
+      "name": "Prepare content context",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        896,
+        64
+      ],
+      "configuration": {
+        "runtime": "JavaScript Code node",
+        "source_code": "redacted"
+      }
+    },
+    {
+      "name": "Prepare content run summary",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4928,
+        416
+      ],
+      "configuration": {
+        "runtime": "JavaScript Code node",
+        "source_code": "redacted"
+      }
+    },
+    {
+      "name": "Generate content strategy",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1120,
+        64
+      ],
+      "configuration": {
+        "transport": "HTTP POST",
+        "service": "OpenAI Responses API",
+        "retry_on_temporary_errors": true,
+        "timeout_configured": true
+      }
+    },
+    {
+      "name": "Normalize strategy and usage",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1344,
+        -16
+      ],
+      "configuration": {
+        "runtime": "JavaScript Code node",
+        "source_code": "redacted"
+      }
+    },
+    {
+      "name": "Capture content generation error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2240,
+        304
+      ],
+      "configuration": {
+        "runtime": "JavaScript Code node",
+        "source_code": "redacted"
+      }
+    },
+    {
+      "name": "Generate LinkedIn post",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        1568,
+        -16
+      ],
+      "configuration": {
+        "transport": "HTTP POST",
+        "service": "OpenAI Responses API",
+        "retry_on_temporary_errors": true,
+        "timeout_configured": true
+      }
+    },
+    {
+      "name": "Normalize LinkedIn post and usage",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1792,
+        -80
+      ],
+      "configuration": {
+        "runtime": "JavaScript Code node",
+        "source_code": "redacted"
+      }
+    },
+    {
+      "name": "Quality check content",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2016,
+        -80
+      ],
+      "configuration": {
+        "transport": "HTTP POST",
+        "service": "OpenAI Responses API",
+        "retry_on_temporary_errors": true,
+        "timeout_configured": true
+      }
+    },
+    {
+      "name": "Normalize quality check and usage",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2240,
+        -128
+      ],
+      "configuration": {
+        "runtime": "JavaScript Code node",
+        "source_code": "redacted"
+      }
+    },
+    {
+      "name": "Prepare final content result",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2464,
+        -128
+      ],
+      "configuration": {
+        "runtime": "JavaScript Code node",
+        "source_code": "redacted"
+      }
+    },
+    {
+      "name": "Write Social Content Studio",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4256,
+        -112
+      ],
+      "configuration": {
+        "service": "Google Sheets",
+        "operation": "appendOrUpdate",
+        "document": "redacted",
+        "sheet": "redacted",
+        "field_mappings": "redacted"
+      }
+    },
+    {
+      "name": "Mark Demand to Content status",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        4480,
+        304
+      ],
+      "configuration": {
+        "service": "Google Sheets",
+        "operation": "appendOrUpdate",
+        "document": "redacted",
+        "sheet": "redacted",
+        "field_mappings": "redacted"
+      }
+    },
+    {
+      "name": "Capture persistence error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4704,
+        -112
+      ],
+      "configuration": {
+        "runtime": "JavaScript Code node",
+        "source_code": "redacted"
+      }
+    },
+    {
+      "name": "Write content automation run",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        5152,
+        416
+      ],
+      "configuration": {
+        "service": "Google Sheets",
+        "operation": "appendOrUpdate",
+        "document": "redacted",
+        "sheet": "redacted",
+        "field_mappings": "redacted"
+      }
+    },
+    {
+      "name": "Prepare visual generation",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2688,
+        -128
+      ],
+      "configuration": {
+        "runtime": "JavaScript Code node",
+        "source_code": "redacted"
+      }
+    },
+    {
+      "name": "Generate branded visual",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        2912,
+        -128
+      ],
+      "configuration": {
+        "transport": "HTTP POST",
+        "service": "OpenAI Images API",
+        "retry_on_temporary_errors": true,
+        "timeout_configured": true
+      }
+    },
+    {
+      "name": "Normalize branded visual",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3136,
+        -208
+      ],
+      "configuration": {
+        "runtime": "JavaScript Code node",
+        "source_code": "redacted"
+      }
+    },
+    {
+      "name": "Has visual data",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        3360,
+        -208
+      ],
+      "configuration": {
+        "branching_logic": "redacted status/data condition"
+      }
+    },
+    {
+      "name": "Convert branded visual to binary",
+      "type": "n8n-nodes-base.convertToFile",
+      "typeVersion": 1.1,
+      "position": [
+        3584,
+        -272
+      ],
+      "configuration": {
+        "parameters": "redacted where applicable"
+      }
+    },
+    {
+      "name": "Upload branded visual to Google Drive",
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        3808,
+        -352
+      ],
+      "configuration": {
+        "service": "Google Drive",
+        "operation": "upload",
+        "folder": "redacted"
+      }
+    },
+    {
+      "name": "Finalize visual metadata",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4032,
+        -400
+      ],
+      "configuration": {
+        "runtime": "JavaScript Code node",
+        "source_code": "redacted"
+      }
+    },
+    {
+      "name": "Capture visual generation error",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        4032,
+        -32
+      ],
+      "configuration": {
+        "runtime": "JavaScript Code node",
+        "source_code": "redacted"
+      }
+    },
+    {
+      "name": "Опис функціональності workflow",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        512,
+        -1184
+      ],
+      "configuration": {
+        "content": "redacted documentation note"
+      }
+    }
+  ],
+  "connections": {
+    "Start content generation": {
+      "main": [
+        [
+          {
+            "node": "Read Demand to Content",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Prepare content run start",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Read Demand to Content": {
+      "main": [
+        [
+          {
+            "node": "Select up to three selected topics",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Capture run-level error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Select up to three selected topics": {
+      "main": [
+        [
+          {
+            "node": "Has selected topics",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Capture run-level error": {
+      "main": [
+        [
+          {
+            "node": "Prepare content run summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has selected topics": {
+      "main": [
+        [
+          {
+            "node": "Prepare content context",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Prepare content run summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare content context": {
+      "main": [
+        [
+          {
+            "node": "Generate content strategy",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare content run summary": {
+      "main": [
+        [
+          {
+            "node": "Write content automation run",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate content strategy": {
+      "main": [
+        [
+          {
+            "node": "Normalize strategy and usage",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Capture content generation error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize strategy and usage": {
+      "main": [
+        [
+          {
+            "node": "Generate LinkedIn post",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Capture content generation error": {
+      "main": [
+        [
+          {
+            "node": "Write Social Content Studio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate LinkedIn post": {
+      "main": [
+        [
+          {
+            "node": "Normalize LinkedIn post and usage",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Capture content generation error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize LinkedIn post and usage": {
+      "main": [
+        [
+          {
+            "node": "Quality check content",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Quality check content": {
+      "main": [
+        [
+          {
+            "node": "Normalize quality check and usage",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Capture content generation error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize quality check and usage": {
+      "main": [
+        [
+          {
+            "node": "Prepare final content result",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Write Social Content Studio": {
+      "main": [
+        [
+          {
+            "node": "Mark Demand to Content status",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Capture persistence error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mark Demand to Content status": {
+      "main": [
+        [
+          {
+            "node": "Prepare content run summary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Capture persistence error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Capture persistence error": {
+      "main": [
+        [
+          {
+            "node": "Prepare content run summary",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare final content result": {
+      "main": [
+        [
+          {
+            "node": "Prepare visual generation",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare visual generation": {
+      "main": [
+        [
+          {
+            "node": "Generate branded visual",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Generate branded visual": {
+      "main": [
+        [
+          {
+            "node": "Normalize branded visual",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Capture visual generation error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Normalize branded visual": {
+      "main": [
+        [
+          {
+            "node": "Has visual data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Has visual data": {
+      "main": [
+        [
+          {
+            "node": "Convert branded visual to binary",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Capture visual generation error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert branded visual to binary": {
+      "main": [
+        [
+          {
+            "node": "Upload branded visual to Google Drive",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Capture visual generation error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Upload branded visual to Google Drive": {
+      "main": [
+        [
+          {
+            "node": "Finalize visual metadata",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Capture visual generation error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Finalize visual metadata": {
+      "main": [
+        [
+          {
+            "node": "Write Social Content Studio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Capture visual generation error": {
+      "main": [
+        [
+          {
+            "node": "Write Social Content Studio",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "operational_contract": {
+    "trigger": "manual",
+    "input_filter": "selected topics",
+    "max_items_per_run": 3,
+    "content_key": "SCS::linkedin::<opportunity_id>",
+    "platform": "linkedin",
+    "language": "ukrainian",
+    "result_review_status": "needs_review",
+    "quality_passed_status_transition": "selected -> generated",
+    "quality_needs_revision_status_transition": "selected remains selected",
+    "visual_storage": "Google Drive folder configured in n8n",
+    "telemetry": "Automation_Runs"
+  }
+}
